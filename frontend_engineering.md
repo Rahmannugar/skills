@@ -85,6 +85,8 @@ Use **React Query** for:
 
 Avoid manual fetch state management.
 
+buttons should be disabled by default when submitting to prevent spammers or multiple submission.
+
 ---
 
 ### Types and Validation
