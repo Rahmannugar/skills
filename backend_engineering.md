@@ -86,6 +86,12 @@ Responsibilities:
 
 Services must remain independent from HTTP frameworks and controllers.
 
+Services should remain focused on domain behavior.
+
+Avoid turning services into large orchestration layers that manage unrelated responsibilities.
+
+If a service becomes too complex, extract additional domain services or utilities.
+
 ---
 
 ### Repositories
@@ -105,6 +111,26 @@ Use ORMs or structured data mappers for database interaction.
 Database queries must not appear in controllers or services.
 
 Transactions should be used for operations that must succeed or fail atomically.
+
+---
+
+### Database Indexing
+
+Database schemas should include appropriate indexes to support common query patterns.
+
+Indexes should be created for:
+
+- frequently filtered fields
+- foreign key relationships
+- fields used for sorting
+- fields used for pagination
+- fields used in joins
+
+Queries that scan large tables without indexes should be avoided.
+
+When designing queries or repositories, consider how the database will execute the query and ensure indexes support expected access patterns.
+
+Avoid excessive indexing that negatively impacts write performance.
 
 ---
 
@@ -234,6 +260,34 @@ Readiness checks should verify critical dependencies such as:
 - required external services
 
 If dependencies fail, readiness checks must fail.
+
+---
+
+### API Response Consistency
+
+API responses should follow a consistent structure across endpoints.
+
+Success responses should return predictable data shapes.
+
+Error responses should follow a standardized format and include meaningful error messages.
+
+Avoid returning inconsistent response formats across different endpoints.
+
+---
+
+### Pagination
+
+Endpoints returning large datasets should implement pagination.
+
+Avoid returning unbounded collections.
+
+Pagination parameters should be supported where appropriate, such as:
+
+- page
+- cursor
+- limit
+
+Pagination responses should provide enough metadata for clients to navigate datasets safely.
 
 ---
 

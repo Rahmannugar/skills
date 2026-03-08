@@ -24,6 +24,14 @@ Follow these principles:
 
 ---
 
+### Respect Existing Architecture
+
+- When working within an existing codebase, prioritize understanding and following the current architecture and patterns.
+- Avoid introducing new architectural styles or restructuring large portions of the system unless there is a clear and justified reason.
+- Prefer extending existing structures rather than replacing them.
+
+---
+
 ### Critical Thinking
 
 - Do not blindly agree with user requests.
@@ -43,4 +51,4 @@ Follow these principles:
 
 - Prefer clarity over cleverness.
 - Avoid premature abstraction or unnecessary complexity.
-- Only introduce abstractions when they solve a real and present problem.
+- Only introduce abstractions when they solve a real and present problem

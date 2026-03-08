@@ -11,6 +11,22 @@ Maintain high engineering standards and consistency with the existing codebase.
 
 ---
 
+### Scope Discipline
+
+- Changes must remain within the scope of the requested task.
+- Avoid modifying unrelated files, modules, or architectural patterns unless explicitly required.
+- Do not introduce refactors that affect large portions of the codebase without clear justification.
+
+---
+
+### Pattern Consistency
+
+- Follow the architectural and structural patterns already present in the codebase.
+- Do not introduce new abstractions, folder structures, or architectural styles if the project already follows an established pattern.
+- Prefer extending existing patterns over creating new ones.
+
+---
+
 ### Architecture Principles
 
 - Favor scalable and maintainable solutions.
@@ -24,6 +40,14 @@ Maintain high engineering standards and consistency with the existing codebase.
 - Avoid placeholder or stub implementations.
 - Implement real, working logic.
 - Keep logic simple, readable, and maintainable.
+
+---
+
+### Simplicity
+
+- Prefer simple and direct solutions.
+- Avoid unnecessary abstractions, excessive indirection, or premature optimization.
+- Introduce abstractions only when they solve a real and recurring problem.
 
 ---
 

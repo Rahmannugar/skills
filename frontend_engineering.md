@@ -260,6 +260,198 @@ Prefer consistent icon sets and purposeful usage.
 
 ---
 
+### UI Copy and Product Language
+
+Do not invent UI copy or product language.
+
+Labels, headings, button text, and UI descriptions must come from:
+
+- the provided requirements
+
+- existing terminology already used in the codebase
+
+Avoid fabricating feature names or branded UI terms.
+
+For example, if the application is called Agently, do not invent UI labels such as:
+
+- "Agently Flow"
+
+- "Agently Secure Link"
+
+- "Agently Dashboard"
+
+unless those exact terms already exist in the codebase or requirements.
+
+If UI copy is not provided, prioritize correct UI structure rather than inventing product language.
+
+---
+
+### UI State Handling
+
+Components that depend on asynchronous data must handle all UI states:
+
+- loading
+
+- error
+
+- empty
+
+- success
+
+Do not assume data is always available.
+
+Use React Query state indicators rather than creating manual loading state logic.
+
+#### Loading States
+
+When data is loading, use skeleton components rather than generic loaders or spinners.
+
+Skeletons should match the layout of the content being loaded so that the UI structure remains stable during loading.
+
+Avoid showing blank screens while data loads.
+
+Use reusable skeleton components where appropriate.
+
+#### Error States
+
+When requests fail, display clear and user-friendly error feedback.
+
+Error messages should:
+
+- be concise
+
+- explain the problem when possible
+
+- provide a retry option when appropriate
+
+Avoid exposing raw server errors directly to the UI.
+
+#### Empty States
+
+When data returns successfully but contains no results, render a meaningful empty state.
+
+Empty states should explain the situation clearly and guide the user toward the next action if applicable.
+
+Avoid showing empty containers without context.
+
+#### User Action Feedback
+
+User-triggered operations must provide clear feedback.
+
+Examples include:
+
+- creating data
+
+- updating data
+
+- deleting data
+
+- submitting forms
+
+- triggering workflows
+
+Use toast notifications for operation feedback.
+
+Examples:
+
+- success notifications
+
+- failure notifications
+
+- confirmation messages
+
+Toasts should be:
+
+- concise
+
+- informative
+
+- consistent across the application
+
+Avoid silent failures or actions without visible feedback.
+
+#### Mutation Handling
+
+Operations that modify data should use React Query mutations.
+
+Mutation flows should include:
+
+- optimistic updates when appropriate
+
+- success toasts
+
+- error toasts
+
+- automatic query invalidation when needed
+
+Avoid manually refetching data when React Query invalidation can handle it.
+
+---
+
+### React Query Query Keys
+
+React Query queries must use consistent and predictable query keys.
+
+Query keys should follow a structured pattern that reflects the resource being fetched.
+
+Example patterns:
+
+- ["users"]
+- ["users", userId]
+- ["orders"]
+- ["orders", orderId]
+- ["orders", { page, filters }]
+
+Guidelines:
+
+- Use array-based query keys rather than string keys.
+
+- Query keys should clearly represent the data being fetched.
+
+- Use consistent naming across services, hooks, and components.
+
+- Avoid duplicating query keys for the same resource.
+
+### Query Invalidation
+
+When mutations modify server data, the corresponding queries must be invalidated.
+
+Mutation success handlers should invalidate only the relevant queries.
+
+Avoid broad invalidation such as clearing all queries when only one resource changes.
+
+Prefer targeted invalidation that matches the query key structure.
+
+### Data Ownership
+
+Components should not call React Query directly for complex logic.
+
+Data access should follow the pattern:
+
+- service → hook → component
+
+Hooks should encapsulate:
+
+- query logic
+
+- mutation logic
+
+- cache invalidation
+
+- optimistic updates
+
+Components should only consume hooks and render UI.
+
+### Derived UI State
+
+Avoid duplicating server data into local component state.
+
+React Query already manages server state.
+
+Use derived values from query results instead of copying data into useState.
+
+---
+
 ### Accessibility
 
 Accessibility is a default requirement, not an optional enhancement.
