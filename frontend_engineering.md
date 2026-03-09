@@ -1,6 +1,6 @@
 ## frontend_engineering
 
-Build frontend systems that are scalable, maintainable, and production ready.  
+Build frontend systems that are scalable, maintainable, and production ready.
 Respect existing project patterns and architecture.
 
 The goal is to produce a clean, modular codebase that scales as the application grows.
@@ -30,15 +30,15 @@ src/
 
 Guidelines:
 
-- `components/ui` contains reusable UI components.
-- `components/shared` contains reusable domain components.
-- `hooks` contains reusable logic hooks.
-- `services` contains API service logic.
-- `api` or `http` contains the API client.
-- `stores` contains global state (Zustand or Context).
-- `types` contains shared TypeScript types and schemas.
-- `utils` contains shared helper utilities.
-- `lib` contains integrations and configuration.
+- components/ui contains reusable UI components.
+- components/shared contains reusable domain components.
+- hooks contains reusable logic hooks.
+- services contains API service logic.
+- api or http contains the API client.
+- stores contains global state (Zustand or Context).
+- types contains shared TypeScript types and schemas.
+- utils contains shared helper utilities.
+- lib contains integrations and configuration.
 
 Avoid dumping logic into components.
 
@@ -50,9 +50,9 @@ Do not fetch data directly inside components.
 
 Use a structured data layer:
 
-1. HTTP/API client
-2. Services
-3. Hooks
+- HTTP/API client
+- Services
+- Hooks
 
 Example structure:
 
@@ -71,12 +71,12 @@ hooks/
 
 Rules:
 
-- Use **axios** for HTTP requests.
-- Create a reusable **HTTP client instance**.
-- API interactions must go through **services**.
-- React components should only interact through **hooks**.
+- Use axios for HTTP requests.
+- Create a reusable HTTP client instance.
+- API interactions must go through services.
+- React components should only interact through hooks.
 
-Use **React Query** for:
+Use React Query for:
 
 - caching
 - background refetching
@@ -85,18 +85,21 @@ Use **React Query** for:
 
 Avoid manual fetch state management.
 
-buttons should be disabled by default when submitting to prevent spammers or multiple submission.
+Buttons should be disabled during submission to prevent duplicate requests or repeated actions.
 
 ---
 
 ### Types and Validation
 
-Use **TypeScript for strict typing** across the application.
+Use TypeScript for strict typing across the application.
 
-- Define shared types in `types/`.
-- Use **Zod** when runtime validation is required.
-- API responses should be typed.
-- Avoid `any`.
+Define shared types in types/.
+
+Use Zod when runtime validation is required.
+
+API responses should be typed.
+
+Avoid any.
 
 Example:
 
@@ -114,16 +117,16 @@ Use the correct tool depending on scope.
 
 Local state:
 
-- `useState`
-- `useReducer`
+- useState
+- useReducer
 
 Server state:
 
-- **React Query**
+- React Query
 
 Global state:
 
-- **Zustand**
+- Zustand
 - React Context when appropriate
 
 Examples of global state:
@@ -148,34 +151,71 @@ Rules:
 
 - A component should never become overly long.
 - Break large components into smaller units.
-- Follow **SOLID** and **DRY** principles.
+- Follow SOLID and DRY principles.
 - Respect existing component patterns in the codebase.
-
-Avoid tightly coupling UI and business logic.
+- Avoid tightly coupling UI and business logic.
 
 ---
 
-### Event Handlers
+### Event Handlers and JSX Callbacks
 
-Do not place complex inline functions inside JSX.
+Avoid writing inline or multi-line functions directly inside JSX.
+
+JSX should remain declarative and free of complex logic.
 
 Bad:
 
 ```tsx
-<button onClick={() => doSomething(id, value)}>
+<input onChange={(e) => setValue(e.target.value)} />
+```
+
+Bad:
+
+```tsx
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleSubmit();
+  }}
+>
+```
+
+Bad:
+
+```tsx
+<button onClick={() => doSomething(id)} />
 ```
 
 Correct pattern:
 
 ```tsx
-const handleClick = () => {
-  doSomething(id, value);
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setValue(e.target.value);
 };
 
-<button onClick={handleClick} />;
+const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  handleSubmit();
+};
+
+const handleClick = () => {
+  doSomething(id);
+};
+
+<input onChange={handleChange} />
+<form onSubmit={handleSubmitForm} />
+<button onClick={handleClick} />
 ```
 
-Handlers should be defined above the return statement.
+Guidelines:
+
+- Define handler functions above the return statement.
+- Use named handler functions such as handleSubmit, handleChange, handleClick, handleDelete.
+- Avoid multi-line functions inside JSX.
+- JSX should reference handlers rather than contain logic.
+- Keep JSX focused on rendering, not execution logic.
+
+This improves readability, maintainability, and debugging.
 
 ---
 
@@ -185,20 +225,20 @@ Use React performance tools when they are appropriate.
 
 Prioritize:
 
-- `ref`
-- `memo`
-- `useMemo`
-- `useCallback`
-- `Suspense`
+- ref
+- memo
+- useMemo
+- useCallback
+- Suspense
 
-Do not use them prematurely.  
+Do not use them prematurely.
 Optimize only when necessary for performance or rendering stability.
 
 ---
 
 ### useEffect Usage
 
-useEffect must be used sparingly.  
+useEffect must be used sparingly.
 Use it only when it is the best or necessary option.
 
 Avoid using it for:
@@ -222,10 +262,10 @@ Use either:
 - shadcn UI
 - or custom components
 
-Structure: `components/ui/`
+Structure: components/ui/
 
-Do not rely on default styles.  
-Customize components to match the application's design system.  
+Do not rely on default styles.
+Customize components to match the application's design system.
 Avoid generic UI libraries and template-like design systems.
 
 ---
@@ -239,7 +279,7 @@ Guidelines:
 - prefer utility-first styling
 - extract reusable UI components when patterns repeat
 - avoid unnecessary CSS files
-- use a global theme color system for consistent colors.
+- use a global theme color system for consistent colors
 
 Avoid hardcoding random colors across components.
 
@@ -247,15 +287,15 @@ Avoid hardcoding random colors across components.
 
 ### Typography
 
-Avoid overused or generic fonts.  
+Avoid overused or generic fonts.
 Use a deliberate typography system that aligns with the product identity.
 
 ---
 
 ### Icons
 
-Avoid generic icon overuse.  
-Icons should match the design language of the product.  
+Avoid generic icon overuse.
+Icons should match the design language of the product.
 Prefer consistent icon sets and purposeful usage.
 
 ---
@@ -267,7 +307,6 @@ Do not invent UI copy or product language.
 Labels, headings, button text, and UI descriptions must come from:
 
 - the provided requirements
-
 - existing terminology already used in the codebase
 
 Avoid fabricating feature names or branded UI terms.
@@ -275,9 +314,7 @@ Avoid fabricating feature names or branded UI terms.
 For example, if the application is called Agently, do not invent UI labels such as:
 
 - "Agently Flow"
-
 - "Agently Secure Link"
-
 - "Agently Dashboard"
 
 unless those exact terms already exist in the codebase or requirements.
@@ -291,18 +328,17 @@ If UI copy is not provided, prioritize correct UI structure rather than inventin
 Components that depend on asynchronous data must handle all UI states:
 
 - loading
-
 - error
-
 - empty
-
 - success
 
 Do not assume data is always available.
 
 Use React Query state indicators rather than creating manual loading state logic.
 
-#### Loading States
+---
+
+### Loading States
 
 When data is loading, use skeleton components rather than generic loaders or spinners.
 
@@ -312,21 +348,23 @@ Avoid showing blank screens while data loads.
 
 Use reusable skeleton components where appropriate.
 
-#### Error States
+---
+
+### Error States
 
 When requests fail, display clear and user-friendly error feedback.
 
 Error messages should:
 
 - be concise
-
 - explain the problem when possible
-
 - provide a retry option when appropriate
 
 Avoid exposing raw server errors directly to the UI.
 
-#### Empty States
+---
+
+### Empty States
 
 When data returns successfully but contains no results, render a meaningful empty state.
 
@@ -334,20 +372,18 @@ Empty states should explain the situation clearly and guide the user toward the 
 
 Avoid showing empty containers without context.
 
-#### User Action Feedback
+---
+
+### User Action Feedback
 
 User-triggered operations must provide clear feedback.
 
 Examples include:
 
 - creating data
-
 - updating data
-
 - deleting data
-
 - submitting forms
-
 - triggering workflows
 
 Use toast notifications for operation feedback.
@@ -355,33 +391,28 @@ Use toast notifications for operation feedback.
 Examples:
 
 - success notifications
-
 - failure notifications
-
 - confirmation messages
 
 Toasts should be:
 
 - concise
-
 - informative
-
 - consistent across the application
 
 Avoid silent failures or actions without visible feedback.
 
-#### Mutation Handling
+---
+
+### Mutation Handling
 
 Operations that modify data should use React Query mutations.
 
 Mutation flows should include:
 
 - optimistic updates when appropriate
-
 - success toasts
-
 - error toasts
-
 - automatic query invalidation when needed
 
 Avoid manually refetching data when React Query invalidation can handle it.
@@ -405,12 +436,11 @@ Example patterns:
 Guidelines:
 
 - Use array-based query keys rather than string keys.
-
 - Query keys should clearly represent the data being fetched.
-
 - Use consistent naming across services, hooks, and components.
-
 - Avoid duplicating query keys for the same resource.
+
+---
 
 ### Query Invalidation
 
@@ -421,6 +451,8 @@ Mutation success handlers should invalidate only the relevant queries.
 Avoid broad invalidation such as clearing all queries when only one resource changes.
 
 Prefer targeted invalidation that matches the query key structure.
+
+---
 
 ### Data Ownership
 
@@ -433,14 +465,13 @@ Data access should follow the pattern:
 Hooks should encapsulate:
 
 - query logic
-
 - mutation logic
-
 - cache invalidation
-
 - optimistic updates
 
 Components should only consume hooks and render UI.
+
+---
 
 ### Derived UI State
 
@@ -487,9 +518,9 @@ Do not blindly copy animated templates.
 
 ### Routing
 
-Routes should be structured and organized.  
-Use index files where appropriate to simplify imports.  
-Pages or routes should follow a predictable structure.  
+Routes should be structured and organized.
+Use index files where appropriate to simplify imports.
+Pages or routes should follow a predictable structure.
 Avoid deeply nested routing without clear purpose.
 
 ---
@@ -498,10 +529,13 @@ Avoid deeply nested routing without clear purpose.
 
 Use the following project tools when relevant:
 
-- **Authorization**: https://github.com/Rahmannugar/auth-rail
-- **Datepicker**: https://github.com/Rahmannugar/byte-datepicker
+- Authorization
+  https://github.com/Rahmannugar/auth-rail
 
-Do not replace these tools with other libraries unless explicitly required.
+- Datepicker
+  https://github.com/Rahmannugar/byte-datepicker
+
+Do not replace these tools with alternative libraries unless explicitly required.
 
 ---
 
@@ -521,22 +555,21 @@ Respect existing project conventions and patterns.
 
 ### Comments
 
-Comments should be minimal, especially inside JSX.  
-Avoid cluttering rendered UI code with comments.  
+Comments should be minimal, especially inside JSX.
+Avoid cluttering rendered UI code with comments.
 Use comments only when they clarify complex logic.
 
 ---
 
 ### Scalability
 
-Every implementation should consider long-term maintainability.  
+Every implementation should consider long-term maintainability.
+
 The codebase must remain:
 
 - modular
 - readable
 - predictable
 
-Avoid shortcuts that create technical debt.  
+Avoid shortcuts that create technical debt.
 Prefer clear architecture and reusable patterns.
-
--
