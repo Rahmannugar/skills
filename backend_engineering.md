@@ -56,6 +56,23 @@ Features should depend on shared modules, not the other way around.
 
 ---
 
+### File and Module Size
+
+Avoid extremely large files or modules that accumulate too many responsibilities.
+
+Large files often indicate:
+
+- hidden coupling between features
+- mixed domain concerns
+- difficult-to-maintain logic
+- unclear ownership of behavior
+
+Prefer splitting logic into smaller modules when files become complex or difficult to reason about.
+
+Backend systems should prioritize clear domain boundaries and manageable module sizes.
+
+---
+
 ### Controllers / Handlers
 
 Controllers must remain thin.
@@ -90,7 +107,49 @@ Services should remain focused on domain behavior.
 
 Avoid turning services into large orchestration layers that manage unrelated responsibilities.
 
-If a service becomes too complex, extract additional domain services or utilities.
+---
+
+### Service Size and Responsibility
+
+Services must remain focused and manageable in size.
+
+A service should:
+
+- represent a clear domain capability
+- coordinate a limited set of related operations
+- remain easy to reason about and test
+
+If a service grows too large or handles multiple workflows, extract additional domain services.
+
+Large service files often hide:
+
+- duplicated domain rules
+- complex control flows
+- tightly coupled responsibilities.
+
+---
+
+### Domain Invariants and Business Rules
+
+Critical domain rules must be enforced consistently across the system.
+
+Examples include:
+
+- account balances must never become negative
+- resources cannot be modified after deletion
+- users cannot access resources outside their authorization scope
+
+These invariants must always be enforced inside domain services.
+
+Never rely solely on:
+
+- controllers
+- frontend validation
+- client assumptions
+
+Backend logic must enforce the system's source-of-truth rules.
+
+Violating domain invariants is a common source of production incidents.
 
 ---
 
@@ -127,8 +186,6 @@ Indexes should be created for:
 - fields used in joins
 
 Queries that scan large tables without indexes should be avoided.
-
-When designing queries or repositories, consider how the database will execute the query and ensure indexes support expected access patterns.
 
 Avoid excessive indexing that negatively impacts write performance.
 
@@ -221,7 +278,7 @@ Startup should include:
 - external service initialization
 - job worker initialization when applicable
 
-Startup failures must terminate the process rather than leaving the system in an inconsistent state.
+Startup failures must terminate the process.
 
 Infrastructure connections may include retry strategies with exponential backoff.
 
@@ -241,8 +298,6 @@ Shutdown procedures must:
 - stop background workers
 - release infrastructure resources
 
-Graceful shutdown prevents request loss and data corruption.
-
 ---
 
 ### Health Checks
@@ -253,13 +308,11 @@ Liveness checks confirm the process is running.
 
 Readiness checks confirm the application is ready to serve traffic.
 
-Readiness checks should verify critical dependencies such as:
+Dependencies to verify include:
 
 - database connectivity
 - cache availability
-- required external services
-
-If dependencies fail, readiness checks must fail.
+- external services
 
 ---
 
@@ -269,9 +322,7 @@ API responses should follow a consistent structure across endpoints.
 
 Success responses should return predictable data shapes.
 
-Error responses should follow a standardized format and include meaningful error messages.
-
-Avoid returning inconsistent response formats across different endpoints.
+Error responses should follow a standardized format with meaningful error messages.
 
 ---
 
@@ -281,13 +332,13 @@ Endpoints returning large datasets should implement pagination.
 
 Avoid returning unbounded collections.
 
-Pagination parameters should be supported where appropriate, such as:
+Support pagination parameters such as:
 
 - page
 - cursor
 - limit
 
-Pagination responses should provide enough metadata for clients to navigate datasets safely.
+Pagination responses should include metadata for safe navigation.
 
 ---
 
@@ -301,7 +352,7 @@ Request identifiers allow:
 - log correlation
 - easier debugging
 
-Logs generated during request processing should include the request context.
+Logs should include request context.
 
 ---
 
@@ -313,10 +364,8 @@ Logs should capture:
 
 - request identifiers
 - service context
-- important state transitions
+- state transitions
 - error details
-
-Logs should help diagnose issues in production.
 
 Avoid excessive or noisy logging.
 
@@ -332,11 +381,9 @@ Errors should be categorized such as:
 - domain errors
 - infrastructure errors
 
-Responses should remain consistent across the API.
-
 Internal implementation details must never be exposed to clients.
 
-Errors must always be logged with sufficient context.
+Errors must be logged with context.
 
 ---
 
@@ -366,7 +413,7 @@ Consider:
 - idempotency
 - concurrent job execution
 
-Operations that must succeed together should be executed within transactions.
+Operations that must succeed together should use transactions.
 
 Avoid global mutable state.
 
@@ -376,14 +423,12 @@ Avoid global mutable state.
 
 Configuration must be centralized.
 
-Configuration should include:
+Configuration includes:
 
 - environment variables
 - database settings
 - cache settings
 - external service configuration
-
-Configuration must not be scattered across the codebase.
 
 Secrets must never be committed to source control.
 
@@ -413,8 +458,6 @@ Unit tests validate domain logic and services.
 Integration tests validate database interactions and API behavior.
 
 Tests should validate real behavior rather than implementation details.
-
-Avoid brittle tests.
 
 ---
 
@@ -452,9 +495,11 @@ Prefer clarity over cleverness.
 
 Comments should remain minimal.
 
-Code should be written clearly enough that behavior is understandable without explanation.
+Comments should only explain:
 
-Comments should only explain complex algorithms, non-obvious architectural decisions, or complex infrastructure logic.
+- complex algorithms
+- non-obvious architectural decisions
+- complex infrastructure logic.
 
 ---
 
@@ -470,5 +515,3 @@ The codebase should remain:
 - safe to refactor
 
 Avoid shortcuts that introduce technical debt.
-
-Favor clear domain boundaries and maintainable patterns.
