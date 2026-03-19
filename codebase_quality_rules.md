@@ -32,6 +32,7 @@ Maintain high engineering standards and consistency with the existing codebase.
 - Favor scalable and maintainable solutions.
 - Follow DRY and SOLID principles where appropriate.
 - Prefer clear module boundaries and separation of concerns.
+- Never use type any, ensure proper type declaration.
 
 ---
 
