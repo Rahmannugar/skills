@@ -102,6 +102,7 @@ Server state:
 Global state:
 
 - Zustand
+- Redux Toolkit
 - React Context when appropriate.
 
 Avoid unnecessary global state.
