@@ -1,207 +1,83 @@
-## backend_logic_audit
-
-Perform a comprehensive technical audit of the backend system with a focus on business logic correctness, data integrity, and system reliability.
-
-The goal is to uncover hidden bugs, logical flaws, failure scenarios, and unsafe assumptions across the codebase.
-
-The audit focuses strictly on functional correctness and system behavior, not style or formatting.
-
+---
+name: backend-logic-audit
+description: Audit backend systems for correctness, reliability, and hidden logic flaws. Use when an assistant should inspect business logic, validation, persistence flows, concurrency behavior, jobs, caching, and security-sensitive backend paths to identify failure scenarios without automatically rewriting the code.
 ---
 
-### Scope of the Audit
+# Backend Logic Audit
 
-Examine the backend system across all modules, including:
+## Audit Goal
 
-- business logic implementation
-- request processing flows
-- validation logic
-- data flow between services
-- database interactions
-- state transitions in domain logic
-- concurrency behavior
-- background job processing
-- caching systems
-- security implications caused by logic flaws
-- inconsistent behavior across modules.
+Audit backend behavior for functional correctness, data integrity, and reliability.
+Focus on how the system behaves under normal and abnormal conditions.
+Do not focus on style, formatting, or naming.
+Do not automatically fix the code.
+Do not recommend refactors unless they directly address a logic flaw.
 
-Focus on how the system behaves under both normal and abnormal conditions.
+## What To Examine
 
----
+Inspect business logic, request flows, validation, data movement between layers, database interactions, state transitions, concurrency behavior, background jobs, caching, and security-sensitive logic paths.
+Look for hidden coupling, duplicated domain rules, unsafe async workflows, and modules that bypass domain boundaries.
+Flag files that are too large or complex to reason about safely when that complexity increases reliability risk.
+Check repository queries for N+1 behavior, missing indexes, accidental full scans, and aggregate queries that should be batched.
+Audit database performance from the request shape, not only from individual slow queries.
+Look for query count, repeated queries, overfetching, connection pool pressure, transaction duration, lock waits, and contention.
+Check API contracts, migrations, authorization, cache behavior, webhook processing, and queue retry behavior for compatibility and failure risks.
 
-### Areas of Investigation
+## What To Look For
 
-Evaluate correctness across the following areas.
-
----
-
-### Business Logic
-
-Audit whether domain logic behaves correctly under all conditions.
-
-Look for:
+Check for:
 
 - incorrect assumptions
-- missing edge case handling
-- inconsistent domain rules
-- incorrect branching logic.
-
----
-
-### Data Integrity
-
-Analyze how data moves through the system.
-
-Look for:
-
-- partial writes
-- inconsistent state transitions
+- missing edge-case handling
+- inconsistent business rules
+- partial writes or invalid state transitions
 - missing transaction boundaries
-- operations leaving the system in invalid states.
-
----
-
-### Database Interaction
-
-Evaluate database access patterns.
-
-Look for:
-
-- missing transactions
 - unsafe concurrent updates
-- assumptions about database consistency
-- queries that can produce inconsistent data.
-
----
-
-### Concurrency and Race Conditions
-
-Analyze situations where concurrent requests could cause failures.
-
-Examples include:
-
-- duplicate submissions
-- conflicting updates
-- job execution overlaps
-- race conditions between services.
-
----
-
-### Background Jobs and Queues
-
-Audit asynchronous processing.
-
-Look for:
-
+- long transactions that hold connections or locks too long
+- inconsistent lock ordering or deadlock-prone resource access
+- incorrect transaction isolation assumptions
 - non-idempotent jobs
-- duplicate job execution
-- jobs depending on request state
-- failure scenarios leaving jobs partially executed.
+- duplicate job execution risks
+- missing rate limits or limits that do not match the threat model
+- trusting proxy headers without an explicit trusted proxy configuration
+- worker locks mistaken for durable business idempotency
+- missing job ledger status or retry state for important transactional jobs
+- cleanup jobs that can resend external side effects unexpectedly
+- message consumers that are not idempotent under at-least-once delivery
+- unversioned or oversized domain events
+- missing liveness/readiness checks
+- unsafe shutdown that can drop in-flight requests or jobs
+- stale or inconsistent cache behavior
+- validation gaps or bypasses
+- missing object-level or resource-level authorization
+- authorization checks that exist only in route guards while service methods can be reused unsafely
+- migration changes that are not backward-compatible with old application versions
+- destructive schema changes without backfill, rollout, or rollback plan
+- API response/request shape changes that can break existing clients
+- webhook signature, replay-window, or idempotency gaps
+- queue retry storms caused by aggressive retry settings or missing backoff
+- cache stampedes, unbounded cache keys, or cache entries without clear invalidation
+- direct-upload flows that trust storage objects without backend confirmation
+- storage confirm flows that fail to verify user namespace, key shape, existence, content type, size, and extension consistency
+- broken authorization or privilege escalation paths
+- user deletion flows that return before revoking active credentials or incrementing token version
+- session invalidation gaps across horizontally scaled instances
+- username uniqueness checks that can race and leak raw database errors
 
----
+## Output Requirements
 
-### Caching Behavior
-
-Examine how caches interact with the source of truth.
-
-Look for:
-
-- stale cache usage
-- cache invalidation problems
-- inconsistent data between cache and database.
-
----
-
-### Validation Logic
-
-Ensure input validation is complete and consistent.
-
-Look for:
-
-- missing validation paths
-- inconsistent validation between endpoints
-- validation bypass scenarios.
-
----
-
-### Security Implications
-
-Identify logic flaws that could cause security vulnerabilities such as:
-
-- broken authorization logic
-- unsafe assumptions about authenticated users
-- privilege escalation through incorrect logic paths.
-
----
-
-### System Architecture and Design Risks
-
-Evaluate architectural patterns that may introduce hidden reliability problems.
-
-Look for:
-
-- hidden coupling between services
-- duplicated domain logic
-- unclear ownership of business rules
-- fragile async workflows
-- modules bypassing domain boundaries.
-
-Identify structural weaknesses that could cause systemic failures.
-
----
-
-### Files That Are Too Large to Maintain
-
-Identify files or modules that have become excessively large.
-
-Large files often hide:
-
-- multiple responsibilities
-- hidden business logic
-- complex control flows
-- fragile dependencies.
-
-Flag files that are difficult to reason about or maintain due to their size or complexity.
-
----
-
-### Important Rules
-
-- Do not automatically fix or rewrite the code.
-- Do not focus on style, formatting, or naming conventions.
-- Do not propose refactors unless they directly address a logic flaw.
-
-The goal is to expose problems, not implement solutions.
-
----
-
-### Output Format
-
-For every issue discovered, provide:
+For every issue found, provide:
 
 - Issue Title
-- Location in Code (file, module, or function)
+- Location in Code
 - Description of the Problem
 - Why It Is a Problem
 - Possible Failure Scenario or Edge Case
-- Severity Level (Critical, High, Medium, Low)
+- Severity Level (`Critical`, `High`, `Medium`, or `Low`)
 
----
+## Reporting Rules
 
-### Systemic Issues
-
-If patterns of problems appear across multiple modules, summarize them under Systemic Issues.
-
-Examples include:
-
-- repeated transaction misuse
-- duplicated domain logic
-- unsafe async workflows
-- inconsistent validation rules.
-
----
-
-### Goal of the Audit
-
-Expose hidden logic vulnerabilities, reliability risks, and failure points before any fixes are attempted.
-
-The outcome should provide a clear understanding of where the backend can break under real-world conditions.
+Present findings first, ordered by severity.
+Summarize recurring patterns under `Systemic Issues` when they appear across modules.
+Keep the audit centered on functional correctness and system behavior.
+The goal is to expose where the backend can break before fixes are attempted.

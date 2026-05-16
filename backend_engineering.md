@@ -1,517 +1,199 @@
-## backend_engineering
-
-Build backend systems that are scalable, reliable, and maintainable.
-
-Design systems that can evolve safely as the application grows.
-Respect existing architecture and patterns in the codebase.
-Do not introduce conflicting patterns unless there is a strong architectural reason.
-
+---
+name: backend-engineering
+description: Backend architecture and implementation guidance for scalable, reliable systems. Use when an assistant is designing, implementing, reviewing, or improving backend services, APIs, jobs, repositories, validation layers, or supporting infrastructure and should preserve clear domain boundaries, data integrity, and operational safety across modular monoliths, microservices, and distributed systems.
 ---
 
-### Architecture Philosophy
+# Backend Engineering
 
-Prefer feature-based architecture.
+## Architectural Posture
 
-Each feature should encapsulate its own domain logic including:
+Build backend systems for scalability, reliability, and maintainability.
+Respect the existing architecture and patterns unless a strong architectural reason requires change.
+Prefer feature-based organization when shaping or extending backend domains.
+Keep shared infrastructure reusable and separate from feature modules.
+Use a modular monolith shape unless the codebase clearly needs distributed services.
+Do not proactively push microservices; use microservice patterns only when the user asks for them or the product constraints clearly demand them.
+When microservices are requested or justified, define service boundaries around business capabilities, data ownership, deployment independence, and failure isolation.
+Avoid microservices when a modular monolith can still provide clear boundaries with lower operational cost.
+Use microservices to solve organizational/deployment scaling, isolated data ownership, independent scaling, or failure isolation problems; do not use them just to split files.
+In microservices, plan API gateways, inter-service contracts, gRPC/REST/event contracts, message flows, observability, retries, timeouts, and eventual consistency from the start.
+Keep feature modules as the home for feature-specific controllers, services, repositories, docs, tests, and jobs.
+Keep reusable plumbing in `infra` modules.
+Choose architecture based on product shape, team size, deployment needs, consistency requirements, operational maturity, and expected scale.
 
-- controllers or handlers
-- services
-- repositories
-- validators
-- types
-- routes
-- tests
+## Organize by Responsibility
 
-Avoid scattering domain logic across unrelated directories.
+Keep domain logic close to the feature it belongs to.
+Place shared infrastructure in reusable modules.
+Ensure features can depend on shared modules, but not the reverse.
+Avoid scattering a feature's logic across unrelated directories.
+Split oversized files or services when they accumulate multiple responsibilities.
+Split by meaningful domain responsibility, not by tiny implementation details.
+Prefer names that are clear without being noisy or over-explicit.
+Use domain slices to avoid god files and services that mix unrelated workflows.
 
-Shared infrastructure should exist separately and be reusable across features.
+For feature modules in any backend stack, prefer:
 
----
-
-### Project Structure
-
-Structure the codebase around features and shared infrastructure.
-
-Typical structure:
-
-```
-src
-  features
-  shared
-  clients
-  jobs
-  cache
-  middleware
-  config
-  db
-  utils
-  types
-  tests
+```txt
+src/<feature>/
+  <feature>.<entrypoint>
+  <feature>.<composition-root>
+  dto/
+  docs/
+  test/
+  repositories/
+  services/
+  jobs/
 ```
 
-Feature modules contain domain logic.
-Shared modules contain infrastructure and reusable tools.
-
-Features should depend on shared modules, not the other way around.
-
----
-
-### File and Module Size
-
-Avoid extremely large files or modules that accumulate too many responsibilities.
-
-Large files often indicate:
-
-- hidden coupling between features
-- mixed domain concerns
-- difficult-to-maintain logic
-- unclear ownership of behavior
-
-Prefer splitting logic into smaller modules when files become complex or difficult to reason about.
-
-Backend systems should prioritize clear domain boundaries and manageable module sizes.
-
----
-
-### Controllers / Handlers
-
-Controllers must remain thin.
-
-Responsibilities:
-
-- parse requests
-- validate inputs
-- call services
-- return responses
-
-Controllers must not contain business logic.
-
-They are responsible only for the request/response layer.
-
----
-
-### Services
-
-Services contain business logic and domain workflows.
-
-Responsibilities:
-
-- enforce domain rules
-- coordinate repositories
-- call external clients
-- orchestrate domain operations
-
-Services must remain independent from HTTP frameworks and controllers.
-
-Services should remain focused on domain behavior.
-
-Avoid turning services into large orchestration layers that manage unrelated responsibilities.
-
----
-
-### Service Size and Responsibility
-
-Services must remain focused and manageable in size.
-
-A service should:
-
-- represent a clear domain capability
-- coordinate a limited set of related operations
-- remain easy to reason about and test
-
-If a service grows too large or handles multiple workflows, extract additional domain services.
-
-Large service files often hide:
-
-- duplicated domain rules
-- complex control flows
-- tightly coupled responsibilities.
-
----
-
-### Domain Invariants and Business Rules
-
-Critical domain rules must be enforced consistently across the system.
-
-Examples include:
-
-- account balances must never become negative
-- resources cannot be modified after deletion
-- users cannot access resources outside their authorization scope
-
-These invariants must always be enforced inside domain services.
-
-Never rely solely on:
-
-- controllers
-- frontend validation
-- client assumptions
-
-Backend logic must enforce the system's source-of-truth rules.
-
-Violating domain invariants is a common source of production incidents.
-
----
-
-### Repositories
-
-Repositories encapsulate all persistence logic.
-
-Responsibilities:
-
-- execute queries
-- persist domain data
-- map database records
-
-Repositories should be the only layer interacting directly with the database.
-
-Use ORMs or structured data mappers for database interaction.
-
-Database queries must not appear in controllers or services.
-
-Transactions should be used for operations that must succeed or fail atomically.
-
----
-
-### Database Indexing
-
-Database schemas should include appropriate indexes to support common query patterns.
-
-Indexes should be created for:
-
-- frequently filtered fields
-- foreign key relationships
-- fields used for sorting
-- fields used for pagination
-- fields used in joins
-
-Queries that scan large tables without indexes should be avoided.
-
-Avoid excessive indexing that negatively impacts write performance.
-
----
-
-### Validation
-
-All external input must be validated before business logic executes.
-
-Validation should occur at request boundaries.
-
-Validation rules should be explicit and centralized.
-
-Never trust external input.
-
----
-
-### External Clients
-
-External integrations must live in a dedicated clients layer.
-
-Clients handle communication with external services such as:
-
-- payment providers
-- email services
-- file storage
-- analytics platforms
-
-Clients should manage:
-
-- request logic
-- error handling
-- retries when appropriate
-
-Services interact with clients rather than calling external APIs directly.
-
----
-
-### Background Jobs
-
-Background jobs should be used for long running or asynchronous tasks.
-
-Examples include:
-
-- email delivery
-- report generation
-- file processing
-- scheduled workflows
-- heavy computations
-
-Jobs must be:
-
-- idempotent
-- retryable
-- observable
-
-Heavy work must not block the request-response cycle.
-
-Jobs must not rely on request context.
-
----
-
-### Caching
-
-Caching should be introduced when it improves performance.
-
-Typical caching targets:
-
-- expensive database queries
-- computed results
-- external API responses
-- frequently accessed resources
-
-Caching must include a clear invalidation strategy.
-
-Avoid stale or inconsistent data.
-
-Caching should exist as a dedicated infrastructure layer.
-
----
-
-### Application Lifecycle
-
-Backend services must manage startup and shutdown correctly.
-
-Startup should include:
-
-- configuration loading
-- database connection initialization
-- external service initialization
-- job worker initialization when applicable
-
-Startup failures must terminate the process.
-
-Infrastructure connections may include retry strategies with exponential backoff.
-
-Retries must always be bounded.
-
----
-
-### Graceful Shutdown
-
-Applications must support graceful shutdown.
-
-Shutdown procedures must:
-
-- stop accepting new requests
-- allow in-flight requests to complete
-- close database connections
-- stop background workers
-- release infrastructure resources
-
----
-
-### Health Checks
-
-Backend systems should expose health endpoints.
-
-Liveness checks confirm the process is running.
-
-Readiness checks confirm the application is ready to serve traffic.
-
-Dependencies to verify include:
-
-- database connectivity
-- cache availability
-- external services
-
----
-
-### API Response Consistency
-
-API responses should follow a consistent structure across endpoints.
-
-Success responses should return predictable data shapes.
-
-Error responses should follow a standardized format with meaningful error messages.
-
----
-
-### Pagination
-
-Endpoints returning large datasets should implement pagination.
-
-Avoid returning unbounded collections.
-
-Support pagination parameters such as:
-
-- page
-- cursor
-- limit
-
-Pagination responses should include metadata for safe navigation.
-
----
-
-### Request Context
-
-Each request should include a unique request identifier.
-
-Request identifiers allow:
-
-- request tracing
-- log correlation
-- easier debugging
-
-Logs should include request context.
-
----
-
-### Logging and Observability
-
-Logging must be structured and contextual.
-
-Logs should capture:
-
-- request identifiers
-- service context
-- state transitions
-- error details
-
-Avoid excessive or noisy logging.
-
----
-
-### Error Handling
-
-Error handling must be centralized.
-
-Errors should be categorized such as:
-
-- validation errors
-- domain errors
-- infrastructure errors
-
-Internal implementation details must never be exposed to clients.
-
-Errors must be logged with context.
-
----
-
-### Middleware
-
-Middleware should handle cross-cutting concerns such as:
-
-- authentication
-- authorization
-- request logging
-- rate limiting
-- request parsing
-- error handling
-
-Middleware must not contain business logic.
-
----
-
-### Concurrency and Data Integrity
-
-Systems must behave correctly under concurrency.
-
-Consider:
-
-- race conditions
-- transactional integrity
-- idempotency
-- concurrent job execution
-
-Operations that must succeed together should use transactions.
-
+Avoid a generic facade service when the controller can depend clearly on domain services.
+
+## Keep Layers Clean
+
+Keep controllers and handlers thin.
+Limit them to request parsing, validation, service calls, and response shaping.
+Place business logic in services.
+Keep services independent from HTTP concerns.
+Use repositories as the only layer that talks directly to persistence.
+Keep queries out of controllers and services.
+Keep repositories focused on persistence access and avoid N+1 query patterns.
+Prefer aggregated queries or explicit batched reads when returning stats or related data.
+Keep external integrations behind client abstractions so storage, mail, payment, and provider clients are replaceable.
+Apply the same layer discipline in any language or framework: handler/controller -> service/use case -> repository/gateway/client.
+
+## Protect Domain Correctness
+
+Enforce domain invariants in backend business logic, not in the frontend or request layer alone.
+Validate all external input at the boundary before business logic runs.
+Use runtime validation for requests, config, queue/job payloads, webhook payloads, message-broker events, file metadata, and external API responses that cross trust boundaries.
+Use transactions when related writes must succeed or fail together.
+Think through race conditions, duplicate submissions, concurrent jobs, and idempotency.
 Avoid global mutable state.
+Use database constraints for invariants that must survive concurrency.
+Handle unique constraint races and transaction conflicts deliberately.
+Understand isolation levels before relying on transaction behavior under concurrency.
+Use consistent lock ordering and short transaction boundaries to reduce contention and deadlocks.
+For security-sensitive flows, do the critical state change synchronously before returning.
+Move only heavy or non-critical cleanup into background jobs.
+Do not leave "later" placeholders for correctness, authorization, observability, idempotency, or cleanup when they are part of the current feature.
 
----
+## Design for Operations
 
-### Configuration Management
+Keep external integrations in dedicated clients.
+Handle errors, retries, and timeouts deliberately.
+Use background jobs for heavy or asynchronous work.
+Make jobs idempotent, retryable, and observable.
+Use durable business idempotency keys for important transactional jobs; worker locks prevent overlap but do not prove business idempotency.
+For important transactional work, prefer durable execution tracking such as a jobs table or outbox/inbox table with status, attempts, timestamps, error details, and a stable idempotency key.
+Use queue job IDs and worker locks as execution controls, not as the only source of truth.
+Let failed durable jobs remain inspectable after max retries.
+Introduce caching only with a clear invalidation strategy.
+Support liveness and readiness health checks, structured logging, request identifiers, graceful shutdown, and centralized error handling.
+Close HTTP servers, consumers, database pools, cache clients, schedulers, and background workers safely on shutdown.
+Add observability as part of initial service design, not as an afterthought.
+Use the product's observability stack deliberately: APM/log platforms such as New Relic, or open stacks such as Prometheus, Grafana, Tempo, and Loki.
+Emit useful logs, metrics, traces, and security/audit events without leaking sensitive data.
+For distributed systems, design for retries, timeouts, circuit breakers, backpressure, graceful degradation, and eventual consistency.
 
-Configuration must be centralized.
+## Queues, Brokers, and Async Boundaries
 
-Configuration includes:
+Use queues for background work and message brokers for async domain events, pub/sub, integration events, and cross-service communication.
+Choose queue or broker semantics deliberately: work distribution, pub/sub fanout, ordered streams, delayed jobs, retry workflows, or event sourcing are different needs.
+Do not add a broker just because it is available; use it when async decoupling, fanout, buffering, integration boundaries, or independent consumers are valuable.
+Assume at-least-once delivery unless the system proves otherwise.
+Make consumers idempotent and safe to retry.
+Use dead-letter or failed-job inspection for important workflows.
+Keep events small, versioned, and tied to stable business meaning.
+Prefer explicit domain events over leaking database row shapes as event payloads.
 
-- environment variables
-- database settings
-- cache settings
-- external service configuration
+## API and Data Discipline
 
-Secrets must never be committed to source control.
+Keep API responses consistent across endpoints.
+Use predictable success and error shapes.
+Paginate large collections.
+Add indexes that match real query patterns while avoiding unnecessary write overhead.
+Centralize configuration and never commit secrets.
+Keep sensitive information out of logs.
+Validate permanent external configuration at startup.
+Treat external client outages as transient runtime failures, but missing external client configuration as startup failure.
+Expose machine-readable API contracts in a way that is easy to download, such as a direct OpenAPI/JSON route or UI link.
+Maintain API compatibility deliberately.
+Version APIs or use additive response/request changes when clients may already depend on the current contract.
+Avoid breaking response shapes, error codes, auth behavior, or webhook payloads without a migration plan.
 
----
+## Schema and Migrations
 
-### Shared Infrastructure
+Treat schema changes as production changes.
+Prefer backward-compatible expand/contract migrations for live systems.
+Separate schema changes, backfills, application reads, application writes, and cleanup when zero-downtime compatibility matters.
+Plan rollback behavior before applying destructive migrations.
+Avoid dropping columns, renaming columns, tightening nullability, or changing enum values until old application versions and data backfills are handled.
+Use constraints and indexes to enforce invariants, but introduce them in a way that respects existing data volume and lock impact.
 
-Shared infrastructure modules should exist for common functionality such as:
+## Security and Auth
 
-- logging
-- database clients
-- request id utilities
-- error handling
-- caching utilities
-- configuration
+Treat auth as a system boundary, not only a login feature.
+Understand session-based, token-based, and hybrid auth tradeoffs.
+Use refresh-token rotation, secure cookies, server-side sessions, revocation, token versioning, and distributed invalidation when the system requires long-lived sessions.
+Protect password reset, email verification, and OAuth/account-linking flows from enumeration, replay, and brute force.
+Use defense in depth: input validation, output shaping, CORS strategy, CSRF protection where applicable, security headers, rate limits, lockouts, and audit events.
+Design rate limits per threat model: IP limits, account limits, route limits, token buckets, sliding windows, lockouts, and trusted proxy handling all solve different problems.
+Put authorization and resource ownership checks in the service/use-case layer, not only in route guards or middleware.
+Use RBAC, ABAC, ownership checks, or policy objects based on the product's permission model.
+Design webhook security with signature verification, timestamp/replay windows, idempotency keys, and durable processing.
+Design secrets and config for rotation: do not bake permanent credentials into code, logs, builds, or long-lived client artifacts.
 
-Shared infrastructure should remain framework-independent when possible.
+## Database and Performance
 
----
+Model data lifecycle explicitly: soft deletes, audit logs, ownership, cascades, retention, and recovery.
+Design indexes around real query patterns, pagination, joins, and ordering.
+Start database performance work from the request, not only the individual query.
+Measure query count, repeated queries, total database time, max query time, wait time, and connection usage per endpoint.
+Profile slow queries after confirming the issue is inside the query itself.
+Detect N+1 queries early; parallelizing N+1 queries may hide latency while increasing database pressure.
+Avoid overfetching: select the fields and relation depth the use case actually needs.
+Treat indexes as access-pattern tools, not generic speed switches.
+For composite indexes, reason about column order and leftmost-prefix usage; do not rely on indexes that do not match the filter/sort access pattern.
+Remember indexes are not free: they add write, storage, and memory overhead.
+Watch connection pool pressure, throughput, transaction duration, and lock wait time.
+Keep transaction boundaries short and intentional.
+Understand isolation levels, contention, deadlocks, and retryable transaction failures.
+Recognize compounding failure: repeated queries increase connection usage, which increases wait time, which lengthens transactions, which increases lock contention.
+Prefer cursor pagination for large or frequently changing collections.
+Use caching as a system layer with explicit consistency and invalidation rules.
 
-### Testing Strategy
+## Search
 
-Backend systems must include multiple layers of testing.
+Choose search based on product needs.
+Use database-backed search for simple filtering, prefix search, small datasets, or operational simplicity.
+Use dedicated search systems when ranking, typo tolerance, faceting, language analysis, high-volume indexing, or independent search scaling matters.
+Keep indexing asynchronous and idempotent when search data is derived from primary data.
 
-Unit tests validate domain logic and services.
+## File and Upload Pipelines
 
-Integration tests validate database interactions and API behavior.
+Design upload flows around trust boundaries, not a specific provider.
+Authorize upload intent on the backend.
+Generate storage keys or object identifiers server-side when ownership matters.
+Use short-lived direct-upload credentials or stream through the backend based on file size, validation needs, and infrastructure constraints.
+Require a backend confirm/finalize step before trusting uploaded data as application state.
+Validate ownership, object identity, existence, content type, size, and other product-specific constraints before saving references.
+Clean up abandoned, replaced, or deleted objects with idempotent background jobs.
+Use multipart/resumable uploads only when file size and product experience justify the added complexity.
 
-Tests should validate real behavior rather than implementation details.
+## Realtime and Integration
 
----
+Prefer SSE over polling for one-way server-to-client updates when the client does not need bidirectional messaging.
+Use WebSockets when bidirectional low-latency interaction is required.
+Use polling only when simplicity, infrastructure limits, or product constraints justify it.
+Use pub/sub or broker-backed fanout behind realtime gateways when horizontally scaled instances need to share events.
+For horizontally scaled realtime systems, design presence, fanout, backpressure, and reconnect semantics deliberately.
+For webhooks and payment flows, verify signatures, store idempotency keys, and treat external systems as at-least-once delivery sources.
 
-### Security
+## Testing and Quality
 
-Security must be treated as a core requirement.
-
-Include:
-
-- strict input validation
-- authentication enforcement
-- authorization checks
-- protection against injection attacks
-- safe handling of secrets
-
-Sensitive information must never appear in logs.
-
----
-
-### Code Quality
-
-Follow modern language conventions and best practices.
-
-Use:
-
-- linters
-- consistent formatting
-- clear naming conventions
-
-Prefer clarity over cleverness.
-
----
-
-### Comments
-
-Comments should remain minimal.
-
-Comments should only explain:
-
-- complex algorithms
-- non-obvious architectural decisions
-- complex infrastructure logic.
-
----
-
-### Scalability and Maintainability
-
-Every implementation must consider long-term maintainability.
-
-The codebase should remain:
-
-- modular
-- predictable
-- easy to extend
-- safe to refactor
-
-Avoid shortcuts that introduce technical debt.
+Test backend logic at multiple levels when appropriate.
+Use unit tests for domain logic and services.
+Use integration tests for persistence and API behavior.
+Favor clarity, maintainability, and safe evolution over shortcuts that create technical debt.
+Prefer a few meaningful tests over broad redundant tests.
+Test edge cases that protect identity, security, cleanup, idempotency, and important state transitions.

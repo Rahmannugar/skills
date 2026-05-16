@@ -1,298 +1,90 @@
-## frontend_engineering
+---
+name: frontend-engineering
+description: Frontend architecture and implementation guidance for scalable, production-ready user interfaces. Use when an assistant is building, extending, or reviewing frontend features and should preserve project patterns, keep UI logic modular, use strong typing, handle async state safely, and maintain accessible, maintainable client-side behavior across web, mobile, and cross-platform clients.
+---
+
+# Frontend Engineering
+
+## Architectural Posture
 
 Build frontend systems that are scalable, maintainable, and production ready.
-
-Respect existing project patterns and architecture.
-
-The goal is to produce a clean, modular codebase that scales as the application grows.
-
----
-
-### Architecture and Folder Structure
-
-Follow clear separation of concerns and structured directories.
-
-Typical structure:
-
-```
-src
-  app / pages
-  components
-    ui
-    shared
-  hooks
-  services
-  api
-  stores
-  types
-  utils
-  lib
-```
-
-Avoid dumping logic into components.
-
----
-
-### File and Module Size
-
-Avoid creating excessively large files.
-
-Large frontend files often indicate:
-
-- multiple responsibilities inside one component
-- tightly coupled UI logic
-- difficult-to-maintain rendering flows
-
-Prefer extracting:
-
-- smaller components
-- reusable hooks
-- shared utilities.
-
----
-
-### Data Fetching and API Layer
-
-Do not fetch data directly inside components.
-
-Use structured layers:
-
-- HTTP client
-- Services
-- Hooks
-
-Use axios for HTTP requests.
-
-Use React Query for:
-
-- caching
-- refetching
-- deduplication
-- loading and error states.
-
-Avoid manual fetch state management.
-
-Buttons should be disabled during submission.
-
----
-
-### Types and Validation
-
-Use TypeScript for strict typing.
-
-Define shared types in types.
-
-Use Zod when runtime validation is required.
-
-Avoid any.
-
----
-
-### State Management
-
-Local state:
-
-- useState
-- useReducer
-
-Server state:
-
-- React Query
-
-Global state:
-
-- Zustand
-- Redux Toolkit
-- React Context when appropriate.
-
-Avoid unnecessary global state.
-
----
-
-### Component Design
-
-Components must be:
-
-- small
-- focused
-- composable
-
-Follow SOLID and DRY principles.
-
-Avoid tightly coupling UI and business logic.
-
----
-
-### Component Size and Responsibility
-
-Components must represent a single UI responsibility.
-
-Large components often hide:
-
-- mixed rendering logic
-- complex conditional flows
-- hidden state bugs
-
-If a component grows too large, extract:
-
-- smaller components
-- hooks
-- utilities.
-
----
-
-### Event Handlers and JSX Callbacks
-
-Avoid inline functions in JSX.
-
-Define handlers above the return statement.
-
-JSX should remain declarative and free of logic.
-
----
-
-### React Optimization
-
-Use:
-
-- ref
-- memo
-- useMemo
-- useCallback
-- Suspense
-
-Only optimize when necessary.
-
----
-
-### useEffect Usage
-
-useEffect must be used sparingly.
-
-Avoid using it for:
-
-- derived state
-- simple calculations
-- logic that belongs in event handlers.
-
-Prefer derived values and React Query.
-
----
-
-### UI Component System
-
-Use:
-
-- shadcn UI
-- or custom components.
-
-Avoid default styles.
-
-Customize components to match the design system.
-
----
-
-### Styling
-
-Use TailwindCSS.
-
-Avoid random colors.
-
-Use a consistent theme system.
-
----
-
-### UI State Handling
-
-All async UI must support:
-
-- loading
-- error
-- empty
-- success states.
-
-Use skeleton components for loading.
-
----
-
-### React Query Query Keys
-
-Use structured query keys.
-
-Example:
-
-```
-["users"]
-["users", userId]
-["orders", { page }]
-```
-
-Avoid duplicate keys.
-
----
-
-### Accessibility
-
-Accessibility is required.
-
-Include:
-
-- semantic HTML
-- keyboard navigation
-- focus states
-- screen reader support.
-
----
-
-### Animations
-
-Use:
-
-- motion
-- GSAP.
-
-Animations should be purposeful.
-
----
-
-### Custom Tools
-
-Use:
-
-- AuthRail
-  https://github.com/Rahmannugar/auth-rail
-
-- Byte DatePicker
-  https://github.com/Rahmannugar/byte-datepicker
-
----
-
-### Code Quality
-
-Use:
-
-- linters
-- consistent formatting
-- consistent imports.
-
----
-
-### Comments
-
-Keep comments minimal.
-
-Only explain complex logic.
-
----
-
-### Scalability
-
-Code must remain:
-
-- modular
-- readable
-- predictable
-
-Avoid technical debt.
-
-Prefer reusable patterns.
+Respect the existing project architecture and visual system.
+Favor clear separation of concerns across pages, components, hooks, services, API code, stores, types, and utilities.
+Avoid dumping business or data-fetching logic into components.
+Split large files when they mix multiple responsibilities.
+Apply the same principle across React, Vue, Svelte, mobile clients, server-rendered apps, and native UI stacks: keep UI rendering, state ownership, data access, validation, and domain workflows distinct.
+Prefer domain-first organization over generalized buckets when the product has clear domains.
+
+## Data and State
+
+Use a structured data layer instead of fetching directly in components.
+Prefer an HTTP client, service layer, and hooks.
+Use the project's established HTTP client.
+Use the project's established server-state library for caching, refetching, deduplication, and loading or error handling.
+Keep access tokens in memory when the backend uses refresh-token cookies.
+Let auth refresh flows update the client memory state deliberately rather than storing access tokens in local storage.
+Use local component or view-model state for local UI concerns.
+Use global state only when ownership is truly shared across distant parts of the app.
+Avoid duplicated state and avoid `any`.
+Use runtime validation when external data cannot be trusted.
+Validate API responses, persisted client state, URL/search params, feature flags, realtime messages, upload metadata, and third-party data when those values cross trust boundaries.
+Disable submission buttons while async submissions are in flight.
+Use client-generated idempotency keys for retryable create/payment/order/upload-confirm style mutations when the backend supports them.
+Generate client types from machine-readable API contracts when available instead of manually retyping payloads.
+Normalize API errors at the data layer so UI code handles predictable error shapes.
+Invalidate or update server-state caches deliberately after mutations.
+Use optimistic updates only when rollback behavior is clear and safe.
+Treat backend validation as the source of truth; use client validation for fast UX feedback, not as the only enforcement.
+
+## Project Structure
+
+Organize frontend code by product domain or route when the app grows beyond simple pages.
+Keep feature-owned components, hooks, schemas, service calls, tests, and state near the feature.
+Keep truly shared UI, utilities, API clients, and design-system primitives in shared folders.
+Avoid god components, god stores, and global state that mixes unrelated product workflows.
+Prefer domain folders such as `auth/`, `users/`, `billing/`, or `rooms/` with local `types`, `schemas`, `api`, `hooks`, `components`, and `state` as needed.
+Avoid top-level generalized `services/`, `hooks/`, or `types/` folders becoming dumping grounds for unrelated domains.
+Use shared folders only for genuinely cross-domain primitives.
+
+## Component Design
+
+Keep components small, focused, and composable.
+Avoid tightly coupling UI rendering and business logic.
+Move reusable behavior into hooks or utilities when complexity grows.
+Keep templates/views declarative.
+Keep event handlers, commands, and effects easy to trace.
+Use framework optimization tools only when they solve a real performance need.
+Avoid effects/watchers for derived state or simple calculations when a computed value is enough.
+
+## UI Reliability and Accessibility
+
+Handle loading, error, empty, and success states for async interfaces.
+Prefer skeletons for loading states when appropriate.
+Use semantic HTML, keyboard support, focus management, and screen-reader-friendly interactions.
+Keep styling consistent with the project's theme system.
+Use the project's established styling and component system.
+Prefer polished, consistent components over default browser-looking UI when consistent with the project.
+Use motion or GSAP only for purposeful animation.
+
+## Upload Flows
+
+For direct-to-storage uploads, call the backend for a short-lived upload URL.
+Upload directly to storage using the returned object key and headers.
+Call the backend confirm endpoint after upload completes.
+Do not treat a direct storage upload as successful application state until confirm succeeds.
+Handle confirm failures by showing a recoverable error and allowing retry or re-upload.
+Use idempotency keys for confirm/finalize steps when repeated client submissions can create duplicate side effects.
+
+## Realtime Updates
+
+Prefer SSE over polling for one-way server-to-client updates.
+Use WebSockets only when the product needs bidirectional low-latency interaction.
+Use polling only when realtime infrastructure is unnecessary or unavailable.
+Handle reconnect, backoff, stale data, and missed-event recovery deliberately.
+
+## Project Preferences
+
+Prefer reusable patterns that scale cleanly as the application grows.
+When relevant, use AuthRail and Byte DatePicker as preferred ecosystem tools.
+Keep comments minimal and only explain genuinely complex logic.
+Favor predictable, maintainable code over clever shortcuts.

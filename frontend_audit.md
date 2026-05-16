@@ -1,214 +1,65 @@
-## frontend_logic_audit
-
-Perform a comprehensive technical audit of the frontend application with a focus on functional correctness, UI state behavior, and reliability of client-side logic.
-
-The goal is to uncover hidden bugs, incorrect state transitions, broken user flows, and edge cases that could cause the interface to behave incorrectly.
-
-This audit focuses strictly on behavior and correctness, not styling or formatting.
-
+---
+name: frontend-logic-audit
+description: Audit frontend applications for behavioral correctness, state reliability, and broken user flows. Use when an assistant should inspect component logic, async state transitions, validation, caching behavior, accessibility interactions, and client-side assumptions to find hidden bugs without redesigning the UI or auto-refactoring the code.
 ---
 
-### Scope of the Audit
+# Frontend Logic Audit
 
-Examine the frontend system holistically, including:
+## Audit Goal
 
-- component logic
-- UI state transitions
-- asynchronous data flows
-- validation behavior
-- user interaction flows
-- error handling scenarios
-- accessibility behavior
-- client-side security implications
-- inconsistent behavior between components
-- incorrect assumptions in UI logic
-- caching and data synchronization behavior
+Audit the frontend for functional correctness, reliable state behavior, and broken user flows.
+Focus on behavior rather than styling or formatting.
+Do not automatically refactor the code.
+Do not propose redesigns.
 
-Focus on how the interface behaves across different states and interactions.
+## What To Examine
 
----
+Inspect component logic, UI state transitions, asynchronous flows, data fetching and caching, validation behavior, user interaction flows, accessibility behavior, and client-side security implications caused by logic flaws.
+Look for duplicated state, stale closures, conflicting updates, fragile async sequencing, inconsistent query behavior, and components that rely on unstable assumptions.
+Flag files that are excessively large or complex when that complexity increases correctness risk.
+Check auth and upload flows for client assumptions that the backend does not guarantee.
 
-### Areas of Investigation
+## What To Look For
 
-Evaluate the correctness of system behavior across the following areas.
+Check for:
 
----
-
-### UI State Transitions
-
-Check whether UI state transitions behave correctly during:
-
-- loading data
-- handling errors
-- submitting forms
-- receiving empty responses
-- updating cached data
-- conditional rendering flows
-
-Identify situations where the UI could enter inconsistent or invalid states.
-
----
-
-### Async Behavior
-
-Analyze asynchronous flows such as:
-
-- API requests
-- mutations
-- optimistic updates
-- retries and refetching
-- parallel requests
-
-Look for:
-
-- race conditions
-- stale data problems
-- broken loading states
-- incorrect sequencing of async operations.
-
----
-
-### State Management
-
-Audit state handling across:
-
-- local component state
-- global state
-- server state
-
-Look for:
-
-- duplicated state
-- stale closures
-- conflicting state updates
+- inconsistent loading, error, empty, and success states
+- race conditions in requests or mutations
+- stale cache usage or bad invalidation
+- missing cache invalidation or optimistic update rollback after mutations
+- duplicated or conflicting state ownership
 - incorrect derived state
-- state that can fall out of sync with the source of truth.
+- broken form or modal flows
+- validation gaps or inconsistent validation order
+- broken keyboard interaction or focus management
+- inaccessible error feedback
+- fragile UI flows that depend on timing assumptions
+- auth refresh races where multiple requests refresh simultaneously or overwrite newer credentials
+- duplicate submissions caused by double-clicks, retry buttons, refreshes, or network retry behavior
+- mutation retries without idempotency keys when duplicate side effects matter
+- route protection that only hides UI without handling unauthorized data/API access
+- access tokens persisted in unsafe long-lived browser storage when the app expects in-memory access tokens
+- missing refresh-token-cookie handling in API clients
+- direct-to-storage uploads that skip backend confirm
+- UI treating a presigned upload as profile state before the backend accepts it
+- stale generated API types or manually typed request payload drift
+- polling used where SSE would provide simpler one-way updates
+- realtime flows without reconnect, backoff, or missed-event recovery
 
----
+## Output Requirements
 
-### Data Fetching and Caching
-
-Examine how the system fetches and synchronizes data.
-
-Look for:
-
-- stale cache usage
-- incorrect query invalidation
-- inconsistent query keys
-- UI rendering outdated data
-- assumptions that cached data is always fresh.
-
----
-
-### User Interaction Flows
-
-Analyze how user actions propagate through the system.
-
-Examples include:
-
-- form submission flows
-- navigation logic
-- multi-step interactions
-- conditional UI flows
-- modal workflows
-- dynamic UI state changes.
-
-Identify situations where user actions could cause inconsistent UI states.
-
----
-
-### Validation Logic
-
-Ensure client-side validation behaves consistently.
-
-Look for:
-
-- missing validation paths
-- inconsistent validation across components
-- validation that allows invalid states to propagate
-- incorrect validation order.
-
----
-
-### Accessibility Behavior
-
-Audit functional accessibility issues such as:
-
-- broken keyboard interactions
-- incorrect focus management
-- inaccessible interactive elements
-- navigation traps
-- inaccessible error messages.
-
----
-
-### System Architecture and Design Risks
-
-Evaluate architectural patterns that may introduce long-term instability.
-
-Look for:
-
-- tight coupling between components
-- duplicated logic across components or hooks
-- components relying on unstable backend assumptions
-- inconsistent state ownership
-- fragile UI flows dependent on timing of async operations.
-
-Identify design patterns that may cause reliability issues as the application grows.
-
----
-
-### Files That Are Too Large to Maintain
-
-Identify files that have grown excessively large or complex.
-
-Large files often indicate:
-
-- hidden coupling between concerns
-- multiple responsibilities within one component
-- logic that should be extracted into hooks or utilities.
-
-Flag files that are difficult to reason about or maintain due to their size or complexity.
-
----
-
-### Important Rules
-
-- Do not rewrite or refactor code automatically.
-- Do not focus on styling, formatting, or naming conventions.
-- Do not propose UI redesigns.
-- Focus only on logic correctness and behavioral reliability.
-
----
-
-### Output Format
-
-For every issue discovered, provide:
+For every issue found, provide:
 
 - Issue Title
-- Location in Code (component, hook, or file)
+- Location in Code
 - Description of the Problem
 - Why It Is a Problem
 - Possible Failure Scenario or Edge Case
-- Severity Level (Critical, High, Medium, Low)
+- Severity Level (`Critical`, `High`, `Medium`, or `Low`)
 
----
+## Reporting Rules
 
-### Systemic Issues
-
-If patterns of problems appear across multiple areas of the system, summarize them under Systemic Issues.
-
-Examples include:
-
-- repeated state management flaws
-- inconsistent async patterns
-- duplicated validation logic
-- fragile UI state patterns.
-
----
-
-### Goal of the Audit
-
-Expose hidden UI logic failures, incorrect state transitions, and edge cases before any fixes are attempted.
-
-The goal is to understand where the interface can break under real user conditions.
+Present findings first, ordered by severity.
+Summarize repeated patterns under `Systemic Issues` when they span multiple areas.
+Keep the audit focused on correctness, state reliability, and real user-facing failure modes.
+The goal is to expose where the interface can break before fixes are attempted.
