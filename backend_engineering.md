@@ -32,19 +32,31 @@ Split by meaningful domain responsibility, not by tiny implementation details.
 Prefer names that are clear without being noisy or over-explicit.
 Use domain slices to avoid god files and services that mix unrelated workflows.
 
-For feature modules in any backend stack, prefer:
+For feature modules in any backend stack, prefer a domain-first shape where each feature owns its entrypoint, composition root, docs, tests, persistence access, business services, and jobs. Adapt filenames to the language/framework, but preserve the responsibility boundaries:
 
 ```txt
 src/<feature>/
-  <feature>.<entrypoint>
-  <feature>.<composition-root>
-  dto/
-  docs/
-  test/
-  repositories/
-  services/
-  jobs/
+  <feature>.<entrypoint>        # controller/router/handler/gateway
+  <feature>.<composition-root>  # module/provider registration/bootstrap wiring
+  <feature>.constants           # feature constants, keys, defaults, limits
+  <feature>.types               # feature-owned domain/transport types when useful
+  dto/                          # request/response validation and transport shapes
+  docs/                         # OpenAPI/Swagger/API docs for this feature
+  test/                         # focused tests for this feature
+  repositories/                 # persistence access only
+  services/                     # business logic and use cases
+  jobs/                         # workers/processors/queue producers owned by feature
 ```
+
+Keep root documentation intentional:
+
+```txt
+README.md        # what the project is, how to run it, core capabilities
+API.md           # public HTTP/realtime contract summary when the API is not fully captured elsewhere
+ARCHITECTURE.md  # system shape, module boundaries, state, jobs, caching, realtime, recovery
+```
+
+Use `docs/` inside feature modules for framework-generated API documentation helpers or feature-specific API examples. Keep `README.md`, `API.md`, and `ARCHITECTURE.md` concise and update them after the system shape is real, not before it exists.
 
 Avoid a generic facade service when the controller can depend clearly on domain services.
 

@@ -39,12 +39,36 @@ Treat backend validation as the source of truth; use client validation for fast 
 ## Project Structure
 
 Organize frontend code by product domain or route when the app grows beyond simple pages.
-Keep feature-owned components, hooks, schemas, service calls, tests, and state near the feature.
+Separate route files, page composition, reusable UI, and feature logic instead of putting everything in one domain folder.
 Keep truly shared UI, utilities, API clients, and design-system primitives in shared folders.
 Avoid god components, god stores, and global state that mixes unrelated product workflows.
-Prefer domain folders such as `auth/`, `users/`, `billing/`, or `rooms/` with local `types`, `schemas`, `api`, `hooks`, `components`, and `state` as needed.
-Avoid top-level generalized `services/`, `hooks/`, or `types/` folders becoming dumping grounds for unrelated domains.
+Avoid top-level generalized `hooks/`, `services/`, or `types/` folders becoming dumping grounds for unrelated domains.
 Use shared folders only for genuinely cross-domain primitives.
+
+Preferred structure for frontend apps:
+
+```txt
+<framework-route-layer>/       # framework route declarations; keep thin
+src/pages/                     # route-level page composition
+src/components/ui/             # design-system primitives
+src/components/common/         # shared reusable UI such as ThemeToggle, EmptyState, ErrorState
+src/components/<domain>/       # domain UI pieces such as auth/login-form.tsx
+src/lib/<domain>/              # domain logic and client-side workflows
+```
+
+For each frontend domain, prefer this lib shape when the files are actually needed:
+
+```txt
+src/lib/<domain>/
+  <domain>.service.ts          # API/client calls or domain service functions
+  <domain>.types.ts            # domain types owned by this feature
+  <domain>.constants.ts        # feature constants, keys, defaults, limits
+  <domain>.store.ts            # feature state only when shared client state is needed
+  use<Domain>.ts               # feature hook; use camelCase filenames, not use-domain.ts
+```
+
+Do not add `schema`, `queries`, or policy/rail files by default. Add validation, query helpers, or policy files only when the feature genuinely needs them, and name them in sympathy with the codebase.
+Framework routes should usually import page components from `src/pages`, while pages compose domain components and hooks. Components should not fetch directly.
 
 ## Component Design
 
@@ -88,3 +112,4 @@ Prefer reusable patterns that scale cleanly as the application grows.
 When relevant, use AuthRail and Byte DatePicker as preferred ecosystem tools.
 Keep comments minimal and only explain genuinely complex logic.
 Favor predictable, maintainable code over clever shortcuts.
+macbook@MacBook-33 Livepoly % 
