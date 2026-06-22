@@ -21,6 +21,27 @@ Keep feature modules as the home for feature-specific controllers, services, rep
 Keep reusable plumbing in `infra` modules.
 Choose architecture based on product shape, team size, deployment needs, consistency requirements, operational maturity, and expected scale.
 
+## Service Boundaries
+
+Define service boundaries around:
+- business capabilities
+- ownership
+- data ownership
+- deployment independence
+
+Avoid splitting services around:
+- database tables
+- CRUD resources
+- technical layers
+
+A service should own its data and business rules.
+
+Cross-service transactions should be avoided in favor of events and eventual consistency.
+
+Prefer explicit contracts between services.
+
+Design APIs, events, and ownership boundaries before designing deployment topology.
+
 ## Organize by Responsibility
 
 Keep domain logic close to the feature it belongs to.
@@ -107,6 +128,73 @@ Use the product's observability stack deliberately: APM/log platforms such as Ne
 Emit useful logs, metrics, traces, and security/audit events without leaking sensitive data.
 For distributed systems, design for retries, timeouts, circuit breakers, backpressure, graceful degradation, and eventual consistency.
 
+## Observability
+
+Observability supports correctness, reliability, debugging, and operations.
+
+Do not introduce significant architectural complexity solely for observability requirements.
+
+Prioritize:
+
+1. Domain correctness
+2. Authorization
+3. Data integrity
+4. Failure handling
+5. Recovery
+6. Observability
+
+Use each signal for its intended purpose:
+
+- Request logs explain transport outcomes.
+- Activity logs explain business events and user actions.
+- Audit logs establish security or compliance facts.
+- Metrics show trends and support alerting.
+- Traces explain execution flow and latency.
+
+Do not use request logs as activity logs.
+
+Prefer structured logs with correlation identifiers such as request IDs, trace IDs, job IDs, message IDs, user IDs, tenant IDs, and relevant domain entity IDs.
+
+Prefer low-cardinality metrics.
+
+Trace bounded units of work such as requests, jobs, webhooks, integrations, and significant realtime messages.
+
+Do not trace connection lifetimes, heartbeats, or routine keepalive traffic.
+
+Favor metrics over logs for high-volume success paths.
+
+Keep secrets, tokens, passwords, cookies, and raw sensitive payloads out of telemetry.
+
+Observability is a supporting concern. A perfectly instrumented system with incorrect business behavior is still a broken system.
+
+## Reliability Patterns
+
+Assume failures are normal.
+
+Distinguish between:
+- transient failures
+- permanent failures
+- partial failures
+
+Retry only when operations are safe to repeat.
+
+Use:
+- idempotency keys
+- outbox pattern
+- inbox pattern
+- deduplication
+- sagas
+- compensating actions
+
+Understand:
+- at-most-once delivery
+- at-least-once delivery
+- exactly-once tradeoffs
+
+Prefer eventual consistency when strong consistency is unnecessary.
+
+Design recovery paths before implementing happy paths.
+
 ## Queues, Brokers, and Async Boundaries
 
 Use queues for background work and message brokers for async domain events, pub/sub, integration events, and cross-service communication.
@@ -117,6 +205,28 @@ Make consumers idempotent and safe to retry.
 Use dead-letter or failed-job inspection for important workflows.
 Keep events small, versioned, and tied to stable business meaning.
 Prefer explicit domain events over leaking database row shapes as event payloads.
+
+## Event Design
+
+Events represent completed business facts.
+
+Prefer:
+- OrderCreated
+- PaymentCaptured
+- UserRegistered
+
+Avoid:
+- SaveOrder
+- UpdateUser
+
+Keep events:
+- immutable
+- versioned
+- business-oriented
+
+Do not expose internal database schemas through event payloads.
+
+Treat events as public contracts once consumed by other systems.
 
 ## API and Data Discipline
 
@@ -141,6 +251,25 @@ Separate schema changes, backfills, application reads, application writes, and c
 Plan rollback behavior before applying destructive migrations.
 Avoid dropping columns, renaming columns, tightening nullability, or changing enum values until old application versions and data backfills are handled.
 Use constraints and indexes to enforce invariants, but introduce them in a way that respects existing data volume and lock impact.
+
+## Data Lifecycle
+
+Model the lifecycle of data explicitly.
+
+Design for:
+- retention
+- archival
+- expiration
+- deletion
+- recovery
+
+Not all data should live forever.
+
+Understand legal, operational, and storage implications of long-lived data.
+
+Separate operational, historical, and analytical data when requirements differ.
+
+Define ownership and cleanup responsibilities for data created by features, jobs, integrations, and uploads.
 
 ## Security and Auth
 
@@ -191,6 +320,25 @@ Require a backend confirm/finalize step before trusting uploaded data as applica
 Validate ownership, object identity, existence, content type, size, and other product-specific constraints before saving references.
 Clean up abandoned, replaced, or deleted objects with idempotent background jobs.
 Use multipart/resumable uploads only when file size and product experience justify the added complexity.
+
+## Recovery Engineering
+
+Design systems for recovery.
+
+Understand:
+- replay
+- reprocessing
+- backfills
+- reconciliation jobs
+- disaster recovery
+
+Keep important workflows replayable.
+
+Prefer append-only audit trails and durable execution records when recovery or investigation is required.
+
+Design recovery procedures before incidents occur.
+
+A system that cannot recover safely is not fully reliable.
 
 ## Realtime and Integration
 
