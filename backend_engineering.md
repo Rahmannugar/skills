@@ -124,11 +124,139 @@ Introduce caching only with a clear invalidation strategy.
 Support liveness and readiness health checks, structured logging, request identifiers, graceful shutdown, and centralized error handling.
 Close HTTP servers, consumers, database pools, cache clients, schedulers, and background workers safely on shutdown.
 Add observability as part of initial service design, not as an afterthought.
+Use Open Telemetry as instrumentation layer.
 Use the product's observability stack deliberately: APM/log platforms such as New Relic, or open stacks such as Prometheus, Grafana, Tempo, and Loki.
 Emit useful logs, metrics, traces, and security/audit events without leaking sensitive data.
 For distributed systems, design for retries, timeouts, circuit breakers, backpressure, graceful degradation, and eventual consistency.
 
 ## Observability
+
+Observability exists to support correctness, reliability, debugging, recovery, and operations.
+
+Do not introduce significant architectural complexity solely for observability requirements.
+
+Observability should help answer:
+
+- Is the system healthy?
+- Is the system behaving correctly?
+- What failed?
+- Why did it fail?
+- Can it be recovered safely?
+
+Prioritize:
+
+1. Domain correctness
+2. Authorization
+3. Data integrity
+4. Failure handling
+5. Recovery
+6. Observability
+
+Observability should support these concerns, not replace them.
+
+Use each signal for its intended purpose:
+
+- Request logs explain transport outcomes.
+- Activity logs explain business events and user actions.
+- Audit logs establish security or compliance facts.
+- Metrics measure system and business health.
+- Traces explain execution flow, latency, and dependency interactions.
+
+Do not use request logs as activity logs.
+
+Prefer structured logs over unstructured text.
+
+Include correlation identifiers where relevant:
+
+- request IDs
+- trace IDs
+- job IDs
+- message IDs
+- user IDs
+- tenant IDs
+- domain entity IDs
+
+Logs should be useful for investigation without requiring fragile text parsing.
+
+Prefer metrics over logs for high-volume success paths.
+
+Use metrics for:
+
+- throughput
+- latency
+- error rates
+- queue depth
+- retry rates
+- resource saturation
+- business workflow success rates
+
+Prefer low-cardinality metrics.
+
+Avoid labels that create unbounded cardinality such as:
+
+- user IDs
+- email addresses
+- request payload values
+- arbitrary identifiers
+
+Trace bounded units of work such as:
+
+- requests
+- background jobs
+- webhook processing
+- integration calls
+- queue consumers
+- significant realtime messages
+
+Do not trace connection lifetimes, heartbeats, or routine keepalive traffic.
+
+Preserve trace context across:
+
+- HTTP requests
+- background jobs
+- queues
+- message brokers
+- webhook processing
+
+A trace should follow a business workflow across system boundaries when possible.
+
+Measure business outcomes separately from infrastructure health.
+
+Examples include:
+
+- orders created
+- payments captured
+- checkout failures
+- successful uploads
+- webhook delivery success
+- reconciliation completion
+
+A technically healthy service can still be failing business workflows.
+
+Design alerts around actionable failures.
+
+Prefer alerts for:
+
+- sustained error rate increases
+- SLO violations
+- dependency outages
+- queue backlogs
+- failed recovery workflows
+- abnormal latency increases
+
+Avoid alerts that do not require human action.
+
+Avoid alerting on every transient failure.
+
+Favor alerts that indicate user impact, operational risk, or recovery failure.
+
+Keep secrets, tokens, passwords, cookies, authentication credentials, and sensitive payloads out of telemetry.
+
+Redact or omit sensitive information before it reaches logs, traces, metrics, or audit systems.
+
+Observability is a supporting concern.
+
+A perfectly instrumented system with incorrect business behavior is still a broken system.
 
 Observability supports correctness, reliability, debugging, and operations.
 
