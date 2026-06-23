@@ -58,6 +58,22 @@ Keep changes tightly aligned to the requested task.
 Do not modify unrelated areas of the codebase.
 Avoid opportunistic refactors unless they are required to complete the task safely.
 
+## Collaborative Delivery
+
+Work in focused slices when the user is actively steering the build.
+Name the intended change before broad edits, especially when touching architecture, schemas, migrations, deployment, auth, security, or shared infrastructure.
+Do not jump from discussion into unrelated implementation.
+Do not auto-commit; give commit messages only when asked.
+Do not inspect secrets files such as `.env` unless explicitly permitted.
+Do not add secret defaults to compose files, env examples, scripts, or docs.
+Prefer code-owned constants over env vars for stable product constants.
+Give one clear recommended path by default; mention alternatives only when the tradeoff matters.
+Do not create empty folders, placeholder files, or decorative structure just to look organized.
+Use plain, domain-specific names that describe the real business flow.
+Avoid noisy abstractions, generic wrappers, and service names that hide what the code actually does.
+Keep changes small enough to review, but large enough to complete a meaningful slice.
+When the user is reviewing the design with you, answer and align first; code only after the direction is clear.
+
 ## Think About Failure Modes
 
 Before implementing, check how the system behaves under:
