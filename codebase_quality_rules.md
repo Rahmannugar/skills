@@ -48,13 +48,37 @@ Write comments only when they clarify non-obvious logic.
 
 ## Testing Expectations
 
-Add unit or integration tests when appropriate for the change.
-Test real behavior and correctness.
-Do not change tests to mask flawed logic.
-If behavior is wrong, fix the implementation rather than weakening the test.
-Avoid testing observability itself unless the feature's functional contract depends on it.
-Mock dependencies in unit tests without turning the test into a duplicate of implementation wiring.
-Prefer targeted tests for behavior that would be costly to regress.
+Write tests where they provide confidence, not merely coverage.
+Scale the number and depth of tests with behavioral complexity, risk, and blast radius; do not impose an arbitrary test count.
+
+Use unit tests for business decisions, invariants, validation, state transitions, error mapping, and meaningful side effects that become clearer with dependencies isolated.
+Include a successful path when it proves meaningful behavior, then cover distinct rejection, boundary, and failure paths.
+Each test should protect a separate behavior or risk.
+
+Do not write tests that only configure a mock to return a value and assert that the service returns the same value.
+Do not duplicate the implementation sequence through mock expectations.
+Do not test framework or third-party library behavior as if it were application logic.
+Use mocks to establish relevant conditions and verify only business-significant interactions.
+
+Use table-driven tests when several inputs exercise the same rule and should produce the same class of outcome.
+Do not create many nearly identical test cases when one clearly named table-driven test communicates the behavior better.
+
+Use integration tests when confidence depends on real boundaries, including:
+- database constraints, transactions, and repository mapping
+- Redis expiry, invalidation, and atomic consumption
+- concurrency, locking, races, and idempotency
+- provider adapters and external-client contracts
+- HTTP cookies, guards, middleware, and request/response wiring
+
+Use end-to-end tests sparingly for critical journeys that must prove several boundaries work together.
+Do not simulate persistence or concurrency guarantees with unit-test mocks.
+Avoid testing observability unless telemetry is itself part of the functional contract.
+
+Test observable outcomes rather than private methods or incidental implementation details.
+Add a regression test when fixing a real bug if it would have failed before the fix.
+Do not weaken tests to hide flawed behavior; fix the implementation.
+Prefer a focused suite of high-information tests over a large suite of repetitive assertions.
+
 
 ## Command and Commit Rules
 
