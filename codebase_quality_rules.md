@@ -79,6 +79,33 @@ Add a regression test when fixing a real bug if it would have failed before the 
 Do not weaken tests to hide flawed behavior; fix the implementation.
 Prefer a focused suite of high-information tests over a large suite of repetitive assertions.
 
+## Versioning
+
+Use semantic versioning for backend services, SDKs, packages, and public API contracts.
+
+The format is:
+
+`MAJOR.MINOR.PATCH`
+
+Use `1.0.0` for the first stable production release.
+
+Increase PATCH when the release only fixes existing behavior and should not require users or clients to change anything.
+
+Example: `1.0.0` -> `1.0.1`
+
+Increase MINOR when the release adds new functionality without breaking existing users or clients.
+
+Example: `1.0.1` -> `1.1.0`
+
+Increase MAJOR when the release breaks existing users or clients and requires them to change code, requests, responses, configuration, or behavior.
+
+Example: `1.1.0` -> `2.0.0`
+
+When unsure, ask: "Can an existing client upgrade without changing anything?"
+
+If yes, use PATCH or MINOR.
+
+If no, use MAJOR.
 
 ## Command and Commit Rules
 
