@@ -94,6 +94,14 @@ Prefer aggregated queries or explicit batched reads when returning stats or rela
 Keep external integrations behind client abstractions so storage, mail, payment, and provider clients are replaceable.
 Apply the same layer discipline in any language or framework: handler/controller -> service/use case -> repository/gateway/client.
 
+## Schema Design
+
+Prefer lean schemas where every table, column, index, and persisted field has a current functional purpose.
+Do not add decorative, speculative, or future-maybe fields just because they could become useful later.
+Before adding a column, name the behavior it supports now: validation, querying, authorization, billing, reporting, auditing, integration, recovery, or another concrete product need.
+Do not use JSON as a shortcut for unclear schema design. Prefer explicit columns and relational tables when data has stable meaning or needs validation, querying, sorting, filtering, permissions, reporting, or business rules. Use JSON only when the payload is intentionally flexible, stored as a snapshot, or shaped by an external system and the application does not need to query or enforce rules on its inner fields.
+If a field is only for possible future analytics, display convenience, or hypothetical audit history, leave it out until the feature actually needs it.
+
 ## Protect Domain Correctness
 
 Enforce domain invariants in backend business logic, not in the frontend or request layer alone.
