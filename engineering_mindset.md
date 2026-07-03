@@ -63,7 +63,7 @@ Avoid opportunistic refactors unless they are required to complete the task safe
 Work in focused slices when the user is actively steering the build.
 Name the intended change before broad edits, especially when touching architecture, schemas, migrations, deployment, auth, security, or shared infrastructure.
 Do not jump from discussion into unrelated implementation.
-Do not auto-commit; give commit messages only when asked.
+Do not auto-commit. Provide commit messages at closeout for completed implementation slices unless the user explicitly says not to.
 Do not inspect secrets files such as `.env` unless explicitly permitted.
 Do not add secret defaults to compose files, env examples, scripts, or docs.
 Prefer code-owned constants over env vars for stable product constants.
@@ -74,9 +74,29 @@ Avoid noisy abstractions, generic wrappers, and service names that hide what the
 Keep changes small enough to review, but large enough to complete a meaningful slice.
 When the user is reviewing the design with you, answer and align first; code only after the direction is clear.
 
+## Project Continuity And Handoff
+
+When completing a meaningful slice of work, leave enough context for the next agent to continue without rediscovering the project from scratch.
+
+If the project has an existing handoff, progress, architecture, operations, or developer guide document, update the relevant document when the work changes durable product direction, architecture, setup, commands, schema, deployment, or next steps.
+
+If no project handoff file exists, include a concise handoff section in the final response with:
+
+- what changed
+- important files touched
+- validation run and results
+- known follow-ups
+- next recommended slice
+- any decisions made during the work
+
+Do not bury durable decisions only in chat. Put them in the project source of truth when one exists.
+
+Do not create a new handoff file unless the user asks or the project clearly has no continuity document and the work spans multiple sessions. One-off tasks do not need a handoff file.
+
 ## Think About Failure Modes
 
 Before implementing, check how the system behaves under:
+
 - invalid input
 - partial failures
 - unexpected event ordering

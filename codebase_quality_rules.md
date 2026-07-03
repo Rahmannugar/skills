@@ -64,6 +64,7 @@ Use table-driven tests when several inputs exercise the same rule and should pro
 Do not create many nearly identical test cases when one clearly named table-driven test communicates the behavior better.
 
 Use integration tests when confidence depends on real boundaries, including:
+
 - database constraints, transactions, and repository mapping
 - Redis expiry, invalidation, and atomic consumption
 - concurrency, locking, races, and idempotency
@@ -107,12 +108,18 @@ If yes, use PATCH or MINOR.
 
 If no, use MAJOR.
 
-## Command and Commit Rules
+## Command, Commit, And Closeout Rules
 
-Do not run CLI commands while operating strictly under this skill.
-Specify the commands that should be executed instead.
-When closing out a feature, provide a commit message.
+Do not auto-commit unless the user explicitly asks.
+
+When operating in a guidance-only mode, do not run CLI commands. Specify the commands that should be executed instead.
+
+When closing out a completed implementation slice, provide a conventional commit message unless the user explicitly says not to.
+
 Use a commit type such as `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, or `build`.
-Keep the subject line to 50 characters or fewer.
-Place extra context in the commit body.
+
+Keep the subject line concise and specific. Use the body only when extra context matters.
+
+Before suggesting a commit message, summarize validation that passed or clearly state what was not run.
+
 When giving commit commands, use `git add .`.
