@@ -81,7 +81,6 @@ When completing a meaningful slice of work, leave enough context for the next ag
 If the project has an existing handoff, progress, architecture, operations, or developer guide document, update the relevant document when the work changes durable product direction, architecture, setup, commands, schema, deployment, or next steps.
 
 If no project handoff file exists, include a concise handoff section in the final response with:
-
 - what changed
 - important files touched
 - validation run and results
@@ -93,10 +92,27 @@ Do not bury durable decisions only in chat. Put them in the project source of tr
 
 Do not create a new handoff file unless the user asks or the project clearly has no continuity document and the work spans multiple sessions. One-off tasks do not need a handoff file.
 
+## Slice Architecture Explanation
+
+When completing a meaningful implementation slice, give a concise technical walkthrough before moving on.
+
+Explain it like you are onboarding the next engineer into the slice, not teaching a beginner and not dumping a changelog.
+
+Cover:
+- the problem the slice solves and where it sits in the product
+- the core architecture: which modules own which responsibilities and why
+- the main runtime flow: request, event, or job path from entrypoint to persistence or external provider
+- important state transitions and data ownership rules
+- security, authorization, failure-mode, idempotency, or operational decisions that shape the implementation
+- user-visible or system-visible behavior that changed
+- validation run and what it proves
+- the next recommended slice and why it follows naturally
+
+Keep it readable and concrete. Reference important files when useful, but do not turn the explanation into a file-by-file inventory. Do not only provide a commit message, test list, or summary of changed files.
+
 ## Think About Failure Modes
 
 Before implementing, check how the system behaves under:
-
 - invalid input
 - partial failures
 - unexpected event ordering
