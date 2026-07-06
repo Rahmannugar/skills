@@ -134,6 +134,7 @@ Close HTTP servers, consumers, database pools, cache clients, schedulers, and ba
 Add observability as part of initial service design, not as an afterthought.
 Use Open Telemetry as instrumentation layer.
 Use the product's observability stack deliberately: APM/log platforms such as New Relic, or open stacks such as Prometheus, Grafana, Tempo, and Loki.
+When selecting observability tooling, follow the stack already present in the repo or deployment environment instead of introducing a competing platform.
 Emit useful logs, metrics, traces, and security/audit events without leaking sensitive data.
 For distributed systems, design for retries, timeouts, circuit breakers, backpressure, graceful degradation, and eventual consistency.
 
@@ -238,6 +239,31 @@ Examples include:
 - successful uploads
 - webhook delivery success
 - reconciliation completion
+
+### Observability Setup Workflow
+
+When asked to set up monitoring, dashboards, alerts, logging, tracing, or observability, first identify the active observability stack from project files, environment variables, deployment manifests, and user context. Do not assume New Relic, Prometheus/Grafana, ELK/OpenSearch, OpenTelemetry, or any specific vendor unless the repo or user confirms it.
+
+Adapt the setup to the chosen stack:
+
+- **New Relic**: use APM entities, logs, infrastructure samples, NRQL dashboards, alert policies, workflows, transaction tracing, error collection, and slow-query visibility.
+- **Prometheus/Grafana stack**: use Prometheus metrics, Grafana dashboards, Alertmanager rules, Loki logs, Tempo traces, and OpenTelemetry instrumentation where applicable.
+- **ELK/OpenSearch**: use structured application logs, index mappings, dashboards, saved searches, alert rules, and trace correlation if APM is present.
+- **OpenTelemetry-first setups**: instrument services with OpenTelemetry APIs/SDKs and route metrics, traces, and logs to the configured backend.
+
+Start with clean signal before dashboards or alerts:
+
+1. Confirm service identity and stable environment labels.
+2. Suppress noisy successful probes such as liveness/readiness checks while preserving readiness failures.
+3. Ensure structured logs include stable query fields such as service name, role, instance id, request id, trace id, user id, job id, queue name, and domain entity ids.
+4. Ensure expected client/application errors are not logged at error level.
+5. Confirm logs, metrics, traces, and infrastructure data arrive under the intended service/entity names.
+
+Create dashboards only after signal quality is acceptable. Prefer widgets that show throughput, latency percentiles, error rate, error and warning logs, operational error tables with correlation ids, CPU, memory, disk, dependency health, queue health when workers exist, and business workflow outcomes when available.
+
+Create alerts after dashboards. Alerts must be actionable and low-noise. Prefer sustained error-rate increases, latency degradation, readiness/dependency failures, error-level application logs, resource saturation, queue backlog/retry exhaustion, failed recovery jobs, and critical business workflow failures. Avoid alerting on every transient failure, successful health probe, routine 4xx, normal reconnects, or metrics that do not require human action.
+
+Set notification routing after alert conditions exist. For any stack, verify that alerts actually notify through the intended workflow, contact point, receiver, destination, or escalation path.
 
 A technically healthy service can still be failing business workflows.
 
