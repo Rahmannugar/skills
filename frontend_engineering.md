@@ -90,6 +90,16 @@ Use the project's established styling and component system.
 Prefer polished, consistent components over default browser-looking UI when consistent with the project.
 Use motion or GSAP only for purposeful animation.
 
+## Design Source Of Truth
+
+For new frontend projects without an existing design, derive the initial design direction from the user's conversation, functional requirements, product domain, audience, workflow needs, and any design specifications provided. Create a concise `DESIGN.md` before or alongside implementation so typography, color, spacing, component tone, layout principles, accessibility expectations, and interaction patterns are explicit. Avoid generic SaaS, dashboard, or landing-page defaults; make the design direction specific to the product and user context.
+
+For existing frontend projects, when the task involves UI maintenance, visual consistency, building UI, redesigning, revamping, theming, changing shared components, or improving visual coherence, inspect the current frontend before making broad visual changes. Review available sources such as app screens, components, Storybook, Tailwind or theme configuration, design tokens, component libraries, Figma files or Figma MCP context when available, brand assets, monorepo references, and existing CSS.
+
+Create `DESIGN.md` if it is missing for design-facing maintenance or consistency work. Update it when it exists but is stale or incomplete. `DESIGN.md` should cover the observed or intended visual principles, typography, color, spacing, layout patterns, component behavior, interaction states, accessibility expectations, and known unknowns. When documenting the current design language, derive it from the existing codebase and assets. Do not invent, modernize, or redesign while documenting the current state. If a design detail cannot be confidently determined, mark it as unknown instead of guessing.
+
+When the user asks to revamp or redesign an existing frontend, first document the current design language and product constraints, then define the intended new direction separately. Do not preserve the old visual language unless the user asks for continuity. If no external design reference is available, infer a specific new design direction from the user's requirements, product goals, audience, workflows, and discussion instead of producing a generic modern UI.
+
 ## Upload Flows
 
 For direct-to-storage uploads, call the backend for a short-lived upload URL.
@@ -112,4 +122,3 @@ Prefer reusable patterns that scale cleanly as the application grows.
 When relevant, use AuthRail and Byte DatePicker as preferred ecosystem tools.
 Keep comments minimal and only explain genuinely complex logic.
 Favor predictable, maintainable code over clever shortcuts.
-macbook@MacBook-33 Livepoly % 
