@@ -25,6 +25,11 @@ Keep access tokens in memory when the backend uses refresh-token cookies.
 Let auth refresh flows update the client memory state deliberately rather than storing access tokens in local storage.
 Use local component or view-model state for local UI concerns.
 Use global state only when ownership is truly shared across distant parts of the app.
+Use stores only for shared client state that must be accessed across distant
+components, survive navigation, or represent a multi-step workflow. Do not
+create stores for one form's input state, one component's modal flag, or server
+data that belongs in the data layer/cache. Avoid duplicating backend state in a
+store without a clear product reason.
 Avoid duplicated state and avoid `any`.
 Use runtime validation when external data cannot be trusted.
 Validate API responses, persisted client state, URL/search params, feature flags, realtime messages, upload metadata, and third-party data when those values cross trust boundaries.
@@ -67,8 +72,45 @@ src/lib/<domain>/
   use<Domain>.ts               # feature hook; use camelCase filenames, not use-domain.ts
 ```
 
+For backend-backed product workflows, prefer this ownership flow:
+
+```txt
+apiClient
+  -> lib/<domain>/<domain>.service.ts
+  -> lib/<domain>/use<Domain>.ts
+  -> components/<domain>/<DomainClient>.tsx
+```
+
+The API client owns HTTP mechanics, credentials, request setup, and normalized
+API errors. Domain services own backend calls, request shaping, response
+mapping, and endpoint-specific logic. Domain hooks own product workflow state
+around loading, errors, success, mutations, cache updates, and side effects.
+Components render the workflow and call hooks. Components should not fetch
+directly.
+
+Use `lib/<domain>/<domain>.types.ts` for domain-owned types when needed. Use
+`lib/<domain>/<domain>.helpers.ts` or `lib/<domain>/<domain>.utils.ts` only
+when a real flow needs shared transformation logic.
+
 Do not add `schema`, `queries`, or policy/rail files by default. Add validation, query helpers, or policy files only when the feature genuinely needs them, and name them in sympathy with the codebase.
 Framework routes should usually import page components from `src/pages`, while pages compose domain components and hooks. Components should not fetch directly.
+
+In file-based routing apps with server/client component boundaries, keep route
+files thin and server-side by default when the framework supports it. Import
+client workflow components named by product flow, such as `LoginClient`,
+`ScopeClient`, or `FrameworksClient`; avoid generic `PageClient` names.
+
+In non-file-routing apps, a domain page or screen component can own the page
+composition directly, such as `LoginPage`, `ScopePage`, or
+`FrameworksPage`. Keep the same separation between route/screen registration,
+domain workflow components, services, hooks, and shared UI.
+
+Use schema-backed or structured validation for meaningful forms. Keep
+validation rules close to the domain, usually in
+`lib/<domain>/<domain>.validation.ts` or the project's established equivalent.
+Client validation is for fast UX feedback and preventing obvious bad
+submissions. Backend validation remains the source of truth. Do not rely only
+on native browser validation for important product flows.
 
 ## Component Design
 
