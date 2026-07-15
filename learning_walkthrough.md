@@ -1,91 +1,122 @@
 ---
 name: learning-walkthrough
-description: Explain an application, feature, system, or code flow so the user can deeply understand how it works. Use when the user wants a teaching-oriented walkthrough of architecture, system structure, data flow, control flow, logic, tradeoffs, or implementation details rather than an audit or rewrite.
+description: Teach code and systems by transferring an executable mental model rather than giving an overview or file inventory. Use for completed implementation slices, focused request/event/job flows, architecture and data-flow explanations, returning to relearn existing work, or learning an unfamiliar codebase deeply enough to reason about, debug, and modify it safely.
 ---
 
 # Learning Walkthrough
 
-Use this skill when the user wants to understand a system, architecture, feature, or codebase well enough to work in it confidently.
+Teach the implementation until the learner can mentally execute it. Do not merely describe its structure.
 
-This is a learning walkthrough, not an audit. The goal is understanding, not bug hunting.
+The walkthrough succeeds when the learner can:
 
-## What to do
+- predict the next step in the runtime flow
+- explain which boundary owns each decision and why
+- track data transformations and durable state changes
+- identify the invariants and failure behavior
+- locate the code involved in a bounded change or investigation
+- narrate the implementation without relying on the walkthrough
 
-Start from the highest-value mental model first:
+## Select the learning context
 
-- what the system, feature, or flow is for
-- which responsibilities are split across which parts of the code
-- how the code structure reflects the architecture
-- what product or operational constraints shaped the design
+Infer the context from the request and adapt the scope:
 
-Then move gradually deeper:
+- **Completed slice:** reconstruct what was implemented from entry point to externally visible or durable outcome. Include the design decisions, proof from tests, operational dependencies, and safe extension points.
+- **Focused flow:** follow one request, event, job, transaction, retry, or failure path through every meaningful boundary.
+- **Re-entry or review:** rebuild the mental model for existing work, emphasizing how the pieces currently collaborate and what must be remembered before changing them.
+- **Unfamiliar codebase:** establish only enough architecture to orient the learner, then teach representative real flows that make the abstractions concrete.
 
-1. Architecture
-2. System structure
-3. Data flow and control flow
-4. Core logic
-5. Implementation details that make behavior predictable
+Do not force these contexts into separate rigid templates. Use the same execution-centered teaching method at the appropriate scale.
 
-Tie explanations back to the code as you go. Show where each concept lives in the repository and how neighboring files/modules collaborate.
-When the topic is not a codebase, tie explanations back to concrete components, services, data stores, protocols, or runtime flows instead.
+## Inspect before teaching
 
-## How to explain
+Read the relevant code, contracts, schema, configuration, migrations, and tests. Trace actual call paths instead of inferring behavior from filenames. When runtime evidence is available, use it to distinguish intended behavior from verified behavior.
 
-Teach rather than document.
+Identify before writing:
 
-- Build intuition before diving into details.
-- Prefer clear mental models over exhaustive file-by-file summaries.
-- Bring in related files only when they help explain the main topic.
-- Explain why the implementation is shaped this way, not just what each part does.
-- Explain tradeoffs, not only mechanics.
-- Call out important assumptions, tradeoffs, and edge cases when they affect how the system behaves.
-- Explain production implications such as scaling, security, failure modes, data consistency, observability, and operational cost when relevant.
+- the responsibility being fulfilled
+- the real entry point and terminal outcome
+- the important boundaries and ownership decisions
+- the state read or mutated
+- the invariants, failure paths, and operational dependencies
+- the evidence that proves the explanation
 
-When useful, explain:
+## Teach through execution
 
-- where requests/events enter the system
-- how data is transformed or validated
-- where important decisions are made
-- how state changes over time
-- what other modules or services a component depends on
-- why a component belongs in a domain/feature module or shared infrastructure layer
-- what is synchronous and security-critical versus what is deferred to jobs
-- how durable job status, retries, and idempotency fit into the flow
-- how direct-to-storage upload and confirm flows protect application state
-- how rate limits, sessions, token invalidation, health checks, and graceful shutdown fit into production behavior
-- how query count, overfetching, indexes, pools, transactions, and locks shape database performance under load
-- when SSE, WebSockets, polling, queues, brokers, or pub/sub are appropriate
-- what can be modified safely next and what requires extra caution
+Begin with a compact mental model that gives the flow a purpose and shape. Treat it as orientation, never as the completed walkthrough.
 
-## Working style
+Then execute the flow in order. At each meaningful step, explain:
 
-Before explaining, inspect the relevant code paths instead of guessing.
+1. what has just entered this boundary
+2. the concrete function, handler, service, or component now in control
+3. what decision or transformation it performs
+4. why that responsibility belongs there
+5. what it calls or emits next
+6. what state, if any, changes
+7. how failure changes the path or external result
 
-Prefer a walkthrough that feels like guided onboarding:
+Use concrete code references throughout. Introduce neighboring files only when they participate in the flow or clarify an ownership boundary. Explain abstractions at the moment they become operationally relevant.
 
-- start broad
-- zoom into the important path
-- connect abstractions to concrete files/functions
-- end with the practical understanding the user would need to modify the code safely
-- end with the safest next modification path when the user is preparing to change the system
+## Build implementation ownership
 
-If the topic is large, organize the explanation around the main flow instead of trying to cover every file.
+Make the mechanics reconstructable, not just understandable in principle. Cover the relevant details among:
+
+- request, command, event, and persistence data shapes
+- validation and normalization order
+- synchronous versus asynchronous boundaries
+- dependency direction and adapter placement
+- transactions, uniqueness, concurrency, idempotency, and retry behavior
+- authentication, authorization, rate limits, and other security boundaries
+- configuration, secrets, health, startup, and graceful failure
+- protocol and error translation between layers or services
+- tests that prove success, conflict, failure, rollback, and concurrency behavior
+- the smallest safe path for modifying or debugging the implementation
+
+Explain important code statements or algorithms closely when their ordering or semantics protect correctness. Do not paraphrase every line mechanically.
+
+## Calibrate depth
+
+Assume the learner understands general software-engineering concepts unless they ask for foundations. Do not reteach basic terminology merely because the walkthrough is educational.
+
+Prefer practical design reasoning:
+
+- why this layer owns the behavior
+- why an alternative would violate a boundary or invariant
+- what the code guarantees rather than merely intends
+- what changes under concurrency, retries, partial failure, or multiple instances
+- which complexity is required by the product and which is an implementation choice
+
+If the learner signals uncertainty, zoom into the concrete path and data rather than replacing the explanation with a simpler overview.
+
+## Use evidence as part of the lesson
+
+Connect tests and runtime checks to the claims they establish. Explain what a passing test proves, what it does not prove, and which production risk it protects against.
+
+For a completed slice, distinguish:
+
+- implemented and verified behavior
+- intentionally deferred behavior
+- assumptions or operational requirements
+- the next coherent slice
+
+When a durable handoff is requested, preserve enough of this model for another session to resume without rediscovering the implementation. Keep progress logs concise; put the reconstructable runtime flow, decisions, invariants, verification commands, and next safe action in the handoff.
 
 ## Avoid
 
-- turning the walkthrough into a code audit
-- leading with bugs, risks, or refactor advice
-- focusing on formatting or naming commentary unless it affects understanding
-- mechanically enumerating every file without building a mental model
+- stopping after an architecture overview
+- using a directory tree or file list as the explanation
+- narrating names without tracing control and data flow
+- generic textbook explanations detached from the implementation
+- assuming beginner knowledge or over-explaining established concepts
+- turning the walkthrough into an unsolicited audit or refactor proposal
+- claiming tests or runtime behavior that was not inspected or verified
+- treating the happy path as the whole system
 
-## Output shape
+## Finish with a reconstruction check
 
-Adapt to the user's question, but usually aim for:
+End at the level appropriate to the request by consolidating:
 
-1. Core idea and purpose
-2. Main building blocks
-3. End-to-end flow through the code
-4. Important implementation details, assumptions, and tradeoffs
-5. Safe next steps or modification guidance when useful
+- the runtime story in compact form
+- the invariants and failure behavior worth retaining
+- where to start when debugging or changing the flow
 
-Use code references throughout so the user can follow along in the repository.
+When useful, ask the learner to predict a failure path or modification point. Use their answer to locate remaining gaps, not as a quiz for its own sake.
