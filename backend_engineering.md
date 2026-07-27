@@ -163,82 +163,71 @@ Prioritize:
 
 Observability should support these concerns, not replace them.
 
-Use each signal for its intended purpose:
+Give every signal one clear responsibility:
 
-- Request logs explain transport outcomes.
-- Activity logs explain business events and user actions.
-- Audit logs establish security or compliance facts.
-- Metrics measure system and business health.
-- Traces explain execution flow, latency, and dependency interactions.
+- Metrics measure contextual system and business health and power alerting.
+- Traces explain individual request, job, message, and dependency execution.
+- Structured application logs record meaningful outcomes, degradation,
+  failures, retries, recovery, and process lifecycle.
+- Activity logs explain user-visible business activity.
+- Audit logs establish durable security or compliance facts.
+- Ingress access records, when operational or forensic requirements need
+  them, provide minimal transport evidence outside the application.
 
-Do not use request logs as activity logs.
+Do not require the application to print a generic successful request-completed
+log for every request when contextual metrics and tracing already own that
+information. Disable or sample such automatic application access logs only
+after metrics and traces cover the flow. Retain minimal ingress access records
+separately when the threat model, incident-response policy, or regulatory
+requirements require a complete transport record.
 
-Prefer structured logs over unstructured text.
+Do not use access logs as activity or audit truth. Do not duplicate the same
+request outcome into ingress logs, application logs, traces, and metrics
+without a defined investigative purpose and retention policy.
 
-Include correlation identifiers where relevant:
+Instrument the four golden signals around stable, contextual operations rather
+than relying only on generic process-wide or protocol-wide totals:
 
-- request IDs
-- trace IDs
-- job IDs
-- message IDs
-- user IDs
-- tenant IDs
-- domain entity IDs
+- latency;
+- traffic;
+- errors;
+- saturation.
 
-Logs should be useful for investigation without requiring fragile text parsing.
+Use bounded operation names such as authentication login, order capture,
+document extraction, queue publication, or reconciliation. Measure business
+outcomes separately from infrastructure health. Use metrics for high-volume
+success paths, workflow outcomes, queue depth and oldest age, retry rates,
+dependency health, and resource saturation.
 
-Prefer metrics over logs for high-volume success paths.
+Prefer low-cardinality metric dimensions such as stable operation, route
+template, status class, worker name, queue name, provider, event type, and
+bounded error category. Never use raw URLs, query strings, user IDs, emails,
+tenant IDs, document IDs, request payloads, or arbitrary identifiers as metric
+labels.
 
-Use metrics for:
+Trace bounded units of work such as requests, background jobs, webhook
+processing, integration calls, queue consumers, and significant realtime
+messages. Preserve trace context across HTTP, jobs, queues, message brokers,
+webhooks, and external providers so a trace can follow a business workflow
+across boundaries. Do not trace connection lifetimes, heartbeats, or routine
+keepalive traffic.
 
-- throughput
-- latency
-- error rates
-- queue depth
-- retry rates
-- resource saturation
-- business workflow success rates
+Prefer structured logs over interpolated strings. Include stable event and
+operation names, outcomes, bounded error codes, and relevant correlation
+identifiers such as request ID, trace ID, job ID, message ID, tenant ID, actor
+ID, and domain entity ID when those identifiers are safe and necessary for
+investigation. Do not put high-cardinality identifiers into metric labels.
 
-Prefer low-cardinality metrics.
+Classify log severity by operational meaning, not merely protocol status.
+Expected validation, authorization, not-found, rate-limit, and conflict
+responses are not automatically warnings or errors. Log a handled condition at
+warning level only when it represents degradation or requires operational
+attention. Log unexpected failures and exhausted recovery at error level.
 
-Avoid labels that create unbounded cardinality such as:
-
-- user IDs
-- email addresses
-- request payload values
-- arbitrary identifiers
-
-Trace bounded units of work such as:
-
-- requests
-- background jobs
-- webhook processing
-- integration calls
-- queue consumers
-- significant realtime messages
-
-Do not trace connection lifetimes, heartbeats, or routine keepalive traffic.
-
-Preserve trace context across:
-
-- HTTP requests
-- background jobs
-- queues
-- message brokers
-- webhook processing
-
-A trace should follow a business workflow across system boundaries when possible.
-
-Measure business outcomes separately from infrastructure health.
-
-Examples include:
-
-- orders created
-- payments captured
-- checkout failures
-- successful uploads
-- webhook delivery success
-- reconciliation completion
+Never send raw URLs, query strings, secrets, tokens, cookies, credentials,
+request bodies, documents, prompts, or sensitive payloads to logs or traces.
+Use normalized route templates and explicit operation names. Redact before
+telemetry leaves the process rather than relying only on downstream filters.
 
 ### Observability Setup Workflow
 
@@ -292,42 +281,6 @@ Observability is a supporting concern.
 
 A perfectly instrumented system with incorrect business behavior is still a broken system.
 
-Observability supports correctness, reliability, debugging, and operations.
-
-Do not introduce significant architectural complexity solely for observability requirements.
-
-Prioritize:
-
-1. Domain correctness
-2. Authorization
-3. Data integrity
-4. Failure handling
-5. Recovery
-6. Observability
-
-Use each signal for its intended purpose:
-
-- Request logs explain transport outcomes.
-- Activity logs explain business events and user actions.
-- Audit logs establish security or compliance facts.
-- Metrics show trends and support alerting.
-- Traces explain execution flow and latency.
-
-Do not use request logs as activity logs.
-
-Prefer structured logs with correlation identifiers such as request IDs, trace IDs, job IDs, message IDs, user IDs, tenant IDs, and relevant domain entity IDs.
-
-Prefer low-cardinality metrics.
-
-Trace bounded units of work such as requests, jobs, webhooks, integrations, and significant realtime messages.
-
-Do not trace connection lifetimes, heartbeats, or routine keepalive traffic.
-
-Favor metrics over logs for high-volume success paths.
-
-Keep secrets, tokens, passwords, cookies, and raw sensitive payloads out of telemetry.
-
-Observability is a supporting concern. A perfectly instrumented system with incorrect business behavior is still a broken system.
 
 ## Reliability Patterns
 
