@@ -46,19 +46,42 @@ Avoid names that are needlessly verbose or encode implementation details that do
 Keep comments minimal and intentional.
 Write comments only when they clarify non-obvious logic.
 
+## Documentation Integrity
+
+Treat reference documentation as the canonical description of the system, not as evidence that implementation work occurred.
+Preserve the project's required root, service, and domain documentation structure and keep each document at its intended scope.
+Update a document only when the contract or durable system truth owned by that document changed or was materially incorrect.
+A bug fix that restores already-documented behavior does not require an API or architecture documentation change.
+
+Keep API documentation focused on observable contracts and behavior.
+Keep architecture documentation focused on durable structure, ownership, dependencies, major flows, and important invariants.
+Do not append implementation details, defensive checks, or individual failure scenarios merely because they mattered to the latest fix.
+When a documentation change is necessary, rewrite or consolidate the canonical explanation instead of adding a repair-specific sentence or paragraph.
+Ask whether the detail would still deserve space if the system had been implemented correctly from the beginning; omit it if not.
+
+Use plain language, short sentences, and the minimum detail needed at the document's abstraction level.
+Keep implementation progress and repair history in progress, handoff, or changelog documents rather than API or architecture references.
+
 ## Testing Expectations
 
 Write tests where they provide confidence, not merely coverage.
 Scale the number and depth of tests with behavioral complexity, risk, and blast radius; do not impose an arbitrary test count.
+Before adding a test, identify the incorrect behavior or realistic regression it would catch.
+Skip tests that only restate static types, constants, trivial assignments, or behavior owned by the language, framework, or dependency.
 
 Use unit tests for business decisions, invariants, validation, state transitions, error mapping, and meaningful side effects that become clearer with dependencies isolated.
 Include a successful path when it proves meaningful behavior, then cover distinct rejection, boundary, and failure paths.
 Each test should protect a separate behavior or risk.
+Give tests short names that state one observable behavior.
+Avoid names that narrate setup, internal sequencing, or several independent outcomes joined together.
+Keep several assertions in one test only when they jointly prove one indivisible behavior.
 
 Do not write tests that only configure a mock to return a value and assert that the service returns the same value.
 Do not duplicate the implementation sequence through mock expectations.
+Do not reproduce the production decision or algorithm inside a fake and then use that fake as the expected-result oracle.
 Do not test framework or third-party library behavior as if it were application logic.
-Use mocks to establish relevant conditions and verify only business-significant interactions.
+Use mocks to establish relevant conditions and observe business-significant interactions, not to manufacture the result being proved.
+Test pass-through behavior only when preserving that value is itself an application contract; otherwise assert the mapping, decision, or side effect owned by the code.
 
 Use table-driven tests when several inputs exercise the same rule and should produce the same class of outcome.
 Do not create many nearly identical test cases when one clearly named table-driven test communicates the behavior better.
@@ -76,7 +99,8 @@ Do not simulate persistence or concurrency guarantees with unit-test mocks.
 Avoid testing observability unless telemetry is itself part of the functional contract.
 
 Test observable outcomes rather than private methods or incidental implementation details.
-Add a regression test when fixing a real bug if it would have failed before the fix.
+A regression test must exercise the faulty behavior: it should fail before the fix and pass after it.
+Confirm the pre-fix failure when practical; if it cannot be confirmed, do not overstate what the test proves.
 Do not weaken tests to hide flawed behavior; fix the implementation.
 Prefer a focused suite of high-information tests over a large suite of repetitive assertions.
 

@@ -53,7 +53,7 @@ Split by meaningful domain responsibility, not by tiny implementation details.
 Prefer names that are clear without being noisy or over-explicit.
 Use domain slices to avoid god files and services that mix unrelated workflows.
 
-For feature modules in any backend stack, prefer a domain-first shape where each feature owns its entrypoint, composition root, docs, tests, persistence access, business services, and jobs. Adapt filenames to the language/framework, but preserve the responsibility boundaries:
+For feature modules in any backend stack, prefer a domain-first shape where each feature owns its entrypoint, composition root, API and architecture documentation when substantial, tests, persistence access, business services, and jobs. Adapt filenames to the language/framework, but preserve the responsibility boundaries:
 
 ```txt
 src/<feature>/
@@ -62,22 +62,37 @@ src/<feature>/
   <feature>.constants           # feature constants, keys, defaults, limits
   <feature>.types               # feature-owned domain/transport types when useful
   dto/                          # request/response validation and transport shapes
-  docs/                         # OpenAPI/Swagger/API docs for this feature
+  API.md                        # domain-owned contract map
+  ARCHITECTURE.md               # domain-owned structure, flow, and invariants
+  docs/                         # generated documentation helpers or focused examples
   test/                         # focused tests for this feature
   repositories/                 # persistence access only
   services/                     # business logic and use cases
   jobs/                         # workers/processors/queue producers owned by feature
 ```
 
-Keep root documentation intentional:
+Every backend project owns these root documents:
 
 ```txt
 README.md        # what the project is, how to run it, core capabilities
-API.md           # public HTTP/realtime contract summary when the API is not fully captured elsewhere
+API.md           # public and internal contract map with links to authoritative specifications
 ARCHITECTURE.md  # system shape, module boundaries, state, jobs, caching, realtime, recovery
 ```
 
-Use `docs/` inside feature modules for framework-generated API documentation helpers or feature-specific API examples. Keep `README.md`, `API.md`, and `ARCHITECTURE.md` concise and update them after the system shape is real, not before it exists.
+In a multi-service repository, give every deployable backend service the same focused `README.md`, `API.md`, and `ARCHITECTURE.md`.
+Give every substantial domain concise `API.md` and `ARCHITECTURE.md` files beside its code.
+Root documents map the whole system; service and domain documents explain only the contracts and architecture they own.
+Link to authoritative OpenAPI, protobuf, event, or schema definitions instead of duplicating them.
+
+Keep these documents complete but do not update them merely because code changed.
+Update `API.md` when its owned contract or observable behavior changes.
+Update `ARCHITECTURE.md` when its owned structure, responsibilities, dependencies, major flow, or durable invariants change.
+A fix that makes the implementation conform to the documented design normally needs no API or architecture edit.
+If reference documentation was incomplete or incorrect, rewrite or consolidate the existing explanation instead of appending details that memorialize the fix.
+Do not accumulate code-level steps, defensive checks, and isolated failure scenarios unless they are necessary to understand the enduring design.
+Use direct, concise language and keep each fact at the document's abstraction level.
+
+Use `docs/` inside feature modules for framework-generated documentation helpers or feature-specific examples.
 
 Avoid a generic facade service when the controller can depend clearly on domain services.
 

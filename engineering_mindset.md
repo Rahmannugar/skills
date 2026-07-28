@@ -78,7 +78,11 @@ When the user is reviewing the design with you, answer and align first; code onl
 
 When completing a meaningful slice of work, leave enough context for the next agent to continue without rediscovering the project from scratch.
 
-If the project has an existing handoff, progress, architecture, operations, or developer guide document, update the relevant document when the work changes durable product direction, architecture, setup, commands, schema, deployment, or next steps.
+Use handoff and progress documents for work completed, verification, unresolved issues, and next steps.
+Update architecture, API, operations, setup, or developer reference documents only when the durable truth owned by that document changed or was materially incorrect.
+A bug fix that restores the behavior already described by a reference document does not require changing that document.
+Do not append a detail to architecture or API documentation merely because it mattered to the latest implementation or fix.
+When a reference update is necessary, rewrite or consolidate the existing explanation so it remains a coherent current-state description rather than an accumulation of repair-specific details.
 
 If no project handoff file exists, include a concise handoff section in the final response with:
 - what changed
