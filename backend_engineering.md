@@ -481,9 +481,11 @@ For webhooks and payment flows, verify signatures, store idempotency keys, and t
 
 ## Testing and Quality
 
-Test backend logic at multiple levels when appropriate.
-Use unit tests for domain logic and services.
-Use integration tests for persistence and API behavior.
-Favor clarity, maintainability, and safe evolution over shortcuts that create technical debt.
-Prefer a few meaningful tests over broad redundant tests.
-Test edge cases that protect identity, security, cleanup, idempotency, and important state transitions.
+Apply the repository's general codebase testing rules. For backend changes, choose the boundary that can actually prove the relevant backend risk:
+
+- Use unit tests for domain decisions, validation, state transitions, error mapping, and meaningful orchestration.
+- Use integration tests for constraints, transactions, repository mapping, concurrency, locking, and durable idempotency.
+- Use HTTP tests selectively for important validation, guards, cookies, headers, response shaping, and public errors. Use end-to-end tests sparingly for critical cross-boundary journeys.
+- For durable jobs, test only relevant lifecycle risks: success, duplicate delivery, retry classification, stale attempts, recovery, or exhaustion. Prove persistence and concurrency against real infrastructure.
+
+Use real infrastructure when correctness depends on database, transaction, locking, queue, or idempotency semantics. Repository, queue, mail, storage, and event interactions are valid observable outcomes when issuing that command is the behavior.
