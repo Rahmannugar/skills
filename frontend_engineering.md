@@ -122,6 +122,26 @@ Keep event handlers, commands, and effects easy to trace.
 Use framework optimization tools only when they solve a real performance need.
 Avoid effects/watchers for derived state or simple calculations when a computed value is enough.
 
+## Product Language And UI Boundaries
+
+Design interfaces around the user's task and mental model, not the backend's resource model or processing sequence.
+Do not expose API names, DTO fields, database terminology, internal statuses, or backend workflow steps merely because they exist. Translate backend data into user-facing concepts and view models. Show a system concept only when the user needs to understand it, choose it, or act on it.
+Do not infer screen structure or copy directly from request and response shapes. A form should not become a visual rendering of backend fields when a simpler user workflow is possible.
+
+Write concise, literal product copy. Prefer direct nouns and verbs over promotional, aspirational, or vague language. Do not add subtitles, helper text, or empty-state prose that only restates a heading, label, or visible action. Add explanatory copy only when it clarifies a constraint, consequence, unfamiliar concept, or error-prone decision.
+Use established product terminology when it exists. Button labels should name the action, field labels should describe information in the user's language, and headings should identify the task or content without unnecessary framing.
+Do not invent product guarantees or behavior. Claims about privacy, permissions, saving, publishing, automation, availability, or side effects must be supported by requirements, existing product language, tests, or verified implementation.
+
+Do not use emoji as interface decoration unless the product's established visual language explicitly calls for it. Do not add icons to every heading, card, field, or action for visual interest. Use an icon only when it improves recognition, communicates state, or supports an established interaction pattern. Use the project's existing icon system, keep icon style consistent, and provide visible text or accessible names when the meaning is not universally clear.
+
+Before completing a UI change, audit the visible interface:
+
+- Remove repetition, ornamental prose, decorative emoji, and unnecessary icons.
+- Replace implementation terminology with language users understand.
+- Verify every claim about system behavior.
+- Confirm that the primary action and next step are immediately clear.
+- Confirm that the UI exposes only the backend concepts the user needs.
+
 ## UI Reliability and Accessibility
 
 Handle loading, error, empty, and success states for async interfaces.
