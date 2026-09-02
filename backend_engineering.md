@@ -373,6 +373,18 @@ Maintain API compatibility deliberately.
 Version APIs or use additive response/request changes when clients may already depend on the current contract.
 Avoid breaking response shapes, error codes, auth behavior, or webhook payloads without a migration plan.
 
+For machine-readable API contracts, generate request documentation from the
+same runtime schemas that validate bodies, parameters, queries, and headers.
+Define response schemas and realistic examples deliberately for each operation
+and status. Shared response schemas may describe a genuinely common shape, but
+must not supply catch-all examples that hide endpoint-specific behavior. Check
+route coverage, operation ownership, references, generated request schemas,
+response-example presence, and example/schema compatibility in CI; a shared
+schema-level example does not satisfy an operation-level example requirement.
+Use focused contract tests where static checks cannot prove important runtime
+responses, and remove superseded manual documentation after migration is
+verified.
+
 ## Schema and Migrations
 
 Treat schema changes as production changes.
