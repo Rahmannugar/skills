@@ -1,72 +1,95 @@
 ---
 name: write-developer-handoff
-description: Write portable implementation handoffs for human software developers. Use when Codex must explain completed or canonical API, backend, frontend, mobile, data-contract, filtering, pagination, analytics, or UI-flow changes to a colleague who does not share the current workspace or prior conversation.
+description: Write clear, portable implementation notes from the user to a developer who does not share the current workspace or conversation.
 ---
 
 # Write Developer Handoff
 
-Produce a practical reference a developer can implement from without access to the current workspace or conversation.
+Write the handoff as a personal note from the user to their colleague.
 
-## Establish the source of truth
+The recipient should understand:
 
-- Identify the recipient, the systems they own, and only the changes that affect them.
-- Inspect authoritative contracts, API documentation, schemas, and agreed product behaviour before writing.
-- Resolve field names, allowed values, count meanings, fallbacks, and edge cases from evidence. Do not guess.
-- Keep internal implementation details out unless the recipient needs them to integrate correctly.
+- what I changed;
+- what already works;
+- what I need them to implement;
+- the exact values, URLs, fields, or behaviour they need;
+- what should happen when they finish.
 
-## Write each change as a usable contract
+They should not need access to my repository, previous messages, or knowledge of
+how my side was implemented.
 
-For each feature, include only the relevant parts of this pattern:
+## Writing voice
 
-```txt
-Feature or change
+Write in the first person, as though I am sending the note myself:
 
-What changed
+- “I have updated…”
+- “The link now uses…”
+- “I need you to…”
+- “When the app receives this link…”
 
-API or reference link
+Address the recipient directly with “you” where appropriate.
 
-Expected request and response behaviour
+Use natural colleague-to-colleague language. The result should sound like a
+practical message I could copy and send, not generated documentation, an
+engineering report, or an agent summary.
 
-Realistic example request, response, or user flow
+Do not mention Codex, tools, commits, tests, local file paths, investigation
+history, or how the handoff was prepared.
 
-UI rules, business meaning, and edge cases
-```
+## Content
 
-Place a direct API documentation link beside the change it supports. Prefer a specific operation panel over a documentation homepage.
+Start with the change or result. Give only enough background to explain what
+the recipient needs to do.
 
-When a change removes compatibility, state the canonical field or behaviour and the absence of a fallback once, where it matters.
+Include:
 
-Use examples for cursor flows, filters, conditional fields, count semantics, renamed values, and other contracts that are easy to misread.
+- the exact public URLs or API endpoints they need;
+- realistic values or payload examples when these prevent misunderstanding;
+- the behaviour their application must implement;
+- important fallbacks and platform differences;
+- identifiers or configuration values they must copy exactly.
 
-Reference an existing application for UI parity only when it is an intentional source of truth and the recipient can access it.
+Explain unfamiliar project-specific terms the first time they appear. Do not
+explain normal concepts the recipient already works with.
 
-## Write for a human colleague
+Separate clearly:
 
-- Use normal headings, short paragraphs, bullets, and code blocks.
-- Default to plain text mappings instead of Markdown tables. Use a table only when the user asks or it materially improves a dense comparison.
-- Lead with the change, not an objective, plan, history, or rationale essay.
-- Explain the minimum reason needed to understand a non-obvious business rule.
-- Use direct, concrete language and the recipient's product vocabulary.
-- Keep the document self-contained without becoming a beginner tutorial.
+1. what I have already done;
+2. what I need the recipient to do;
+3. the final expected flow.
 
-Do not include by default:
+Do not prescribe their internal architecture unless a specific implementation
+detail is required for the integration to work.
 
-- local repository paths or changed-file inventories;
-- agent status, tool activity, commits, tests, or dirty-worktree details;
-- invented frontend types or architecture prescriptions;
-- internal facts the recipient already knows, such as their own deployment status;
-- objectives, acceptance ceremonies, long verification scripts, or a chronological changelog;
-- prose that merely repeats the API example.
+## Keep it simple
 
-Include repository files, code types, or detailed implementation steps only when the user explicitly asks for them or the recipient owns that exact codebase and needs those details.
+Prefer short paragraphs and short numbered steps.
 
-## Check the handoff before delivery
+Do not turn a small change into a full specification. Remove:
 
-Confirm that:
+- obvious statements;
+- repeated behaviour;
+- unnecessary warnings;
+- long testing checklists;
+- repository inventories;
+- internal backend or frontend implementation details;
+- history and rationale that do not affect implementation;
+- generic instructions such as “handle errors appropriately.”
 
-- it remains useful if copied outside the current repository;
-- a recipient with no backend or conversation context can understand every changed contract;
-- important APIs have nearby direct links and realistic examples;
-- filter visibility, count meanings, conditional fields, and removed fallbacks are explicit;
-- it contains no workspace-specific or obvious internal commentary;
-- it reads as a reference, not a tutorial, project plan, agent summary, or release story.
+Mention a constraint once, where it becomes relevant.
+
+Use headings only when they make the note easier to scan. Do not force every
+handoff into the same template.
+
+## Verify before writing
+
+Inspect the source of truth before stating URLs, field names, identifiers,
+allowed values, fallbacks, or platform behaviour. Do not guess.
+
+Before delivering, confirm that:
+
+- the note sounds like it came from me;
+- someone outside the current conversation can understand it;
+- the recipient knows exactly what they must implement;
+- every copied value is correct;
+- nothing irrelevant has been included.
