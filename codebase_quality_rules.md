@@ -65,6 +65,37 @@ Ask whether the detail would still deserve space if the system had been implemen
 Use plain language, short sentences, and the minimum detail needed at the document's abstraction level.
 Keep implementation progress and repair history in progress, handoff, or changelog documents rather than API or architecture references.
 
+## API And Architecture Documentation
+
+Keep domain API documentation concise and derived from the actual route
+definitions.
+
+For each endpoint:
+
+1. Write a short description first.
+2. Put the complete public endpoint on the next line.
+3. Use the full mounted route, including controller prefixes.
+4. Never use shorthand paths such as `GET /` when the mounted route is longer.
+5. Group endpoints under clear domain headings.
+6. Keep request and response schema detail in generated OpenAPI or Swagger
+   declarations.
+7. Do not add meta-commentary, implementation history, workflow essays, or
+   architecture explanations to API documentation.
+
+Keep architecture documentation concise and structural. Describe:
+
+- domain ownership;
+- important entities and relationships;
+- module and service boundaries;
+- durable state transitions;
+- authorization boundaries;
+- transaction, concurrency, idempotency, and recovery invariants.
+
+Use short sentences and clear grammar. Do not write architecture documents as
+articles or delivery reports. Put progress, repair history, and pending work in
+continuation or handoff documents.
+
+
 ## Testing Expectations
 
 Treat tests as proportionate evidence for a change, not as a separate delivery goal. Follow the repository's established test strategy and scale effort with behavioral risk, complexity, and blast radius.
