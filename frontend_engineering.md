@@ -44,6 +44,7 @@ Treat backend validation as the source of truth; use client validation for fast 
 ## Project Structure
 
 Organize frontend code by product domain or route when the app grows beyond simple pages.
+Follow project-specific naming and structure conventions before generic framework idioms. Keep feature-owned components, hooks, services, types, validation, and tests together; do not place feature code in global `components`, `hooks`, `services`, or `types` dumping grounds unless it is genuinely shared. Use names that express the user workflow or domain responsibility.
 Separate route files, page composition, reusable UI, and feature logic instead of putting everything in one domain folder.
 Keep truly shared UI, utilities, API clients, and design-system primitives in shared folders.
 Avoid god components, god stores, and global state that mixes unrelated product workflows.
@@ -187,4 +188,5 @@ Handle reconnect, backoff, stale data, and missed-event recovery deliberately.
 Prefer reusable patterns that scale cleanly as the application grows.
 When relevant, use AuthRail and Byte DatePicker as preferred ecosystem tools.
 Keep comments minimal and only explain genuinely complex logic.
+When a non-obvious state transition, async race, cache update, accessibility workaround, or recovery path needs explanation, add a short action-oriented comment describing the reason or user-visible guarantee. Avoid comments that merely narrate JSX or restate a function name.
 Favor predictable, maintainable code over clever shortcuts.

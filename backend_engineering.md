@@ -19,6 +19,7 @@ Use microservices to solve organizational/deployment scaling, isolated data owne
 In microservices, plan API gateways, inter-service contracts, gRPC/REST/event contracts, message flows, observability, retries, timeouts, and eventual consistency from the start.
 Keep feature modules as the home for feature-specific controllers, services, repositories, docs, tests, and jobs.
 Keep reusable plumbing in `infra` modules.
+Treat project-specific domain naming and structure as stronger than generic framework or language idioms. Name application actions after the business operation rather than defaulting to generic `Handle`, `Process`, or `Execute`. Keep domain-owned persistence queries, generated adapters, and tests under the owning domain; use shared technical folders only for genuinely reusable capabilities. Use explicit role-based filenames when the repository convention calls for them, while preserving generator-required filenames.
 Choose architecture based on product shape, team size, deployment needs, consistency requirements, operational maturity, and expected scale.
 
 ## Service Boundaries
@@ -52,6 +53,8 @@ Split oversized files or services when they accumulate multiple responsibilities
 Split by meaningful domain responsibility, not by tiny implementation details.
 Prefer names that are clear without being noisy or over-explicit.
 Use domain slices to avoid god files and services that mix unrelated workflows.
+
+Before adding a file or folder, identify its business owner and responsibility. Prefer a small domain package with explicit entrypoint, application service, repository, adapter, query, and test files over a global technical bucket. Add concise comments before non-obvious transaction, idempotency, locking, retry, compensation, or external-call blocks to explain the protected invariant or recovery guarantee.
 
 For feature modules in any backend stack, prefer a domain-first shape where each feature owns its entrypoint, composition root, API and architecture documentation when substantial, tests, persistence access, business services, and jobs. Adapt filenames to the language/framework, but preserve the responsibility boundaries:
 

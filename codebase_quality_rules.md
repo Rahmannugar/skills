@@ -13,6 +13,8 @@ Avoid introducing new abstractions, folder structures, or architectural styles w
 When a project has feature modules, keep feature-owned services, repositories, docs, tests, and jobs inside that feature.
 Keep shared reusable infrastructure under the established infra/shared location.
 
+Project conventions and explicit architecture documents take precedence over generic language idioms. Inspect neighboring code and project guidance before choosing names or locations. Organize code by owning business capability first; keep domain-specific handlers, services, repositories, queries, adapters, and tests together. Do not use generic `models`, `services`, `repositories`, `queries`, or `utils` buckets for domain-owned code unless the folder is intentionally shared. Prefer explicit domain-role filenames such as `<domain>.service.*`, `<domain>.repository.*`, and `<domain>.service_test.*` when they improve ownership and discoverability. Preserve tool-controlled generated names such as `*.sql.go`.
+
 ## Keep Scope Tight
 
 Stay within the requested task.
@@ -45,6 +47,7 @@ Avoid ambiguous or overly abbreviated identifiers.
 Avoid names that are needlessly verbose or encode implementation details that do not help the caller.
 Keep comments minimal and intentional.
 Write comments only when they clarify non-obvious logic.
+Add concise action-oriented comments before non-obvious business, persistence, concurrency, recovery, security, or integration blocks. Explain why the block exists, which invariant it protects, or what observable behavior it guarantees. Do not narrate obvious syntax, restate the following code, or comment every function.
 
 ## Documentation Integrity
 
