@@ -503,4 +503,6 @@ Apply the repository's general codebase testing rules. For backend changes, choo
 - Use HTTP tests selectively for important validation, guards, cookies, headers, response shaping, and public errors. Use end-to-end tests sparingly for critical cross-boundary journeys.
 - For durable jobs, test only relevant lifecycle risks: success, duplicate delivery, retry classification, stale attempts, recovery, or exhaustion. Prove persistence and concurrency against real infrastructure.
 
-Use real infrastructure when correctness depends on database, transaction, locking, queue, or idempotency semantics. Repository, queue, mail, storage, and event interactions are valid observable outcomes when issuing that command is the behavior.
+Use **real infrastructure in integration tests**, preferably through **Testcontainers**, when correctness depends on database, transaction, locking, queue, or idempotency semantics. **Do not mock infrastructure dependencies in integration tests when their real behavior is part of what the test needs to prove.** Keep mocks primarily for unit tests or for external systems that cannot reasonably be exercised in the test environment.
+
+Repository, queue, mail, storage, and event interactions are valid observable outcomes when issuing that command is the behavior.
