@@ -25,6 +25,24 @@ Separate nice-to-have hardening from required production behavior.
 Call out which category a recommendation belongs to.
 Let product requirements decide architecture; do not apply the same pattern everywhere by habit.
 
+## Data Structures And Algorithmic Efficiency
+
+Consider data structures and algorithms in the code being designed, changed, or reviewed. Keep this reasoning within the task's scope; do not expand into unrelated performance audits or refactors.
+
+Base choices on expected input size, growth, operation frequency, and latency and memory constraints. State assumptions when they materially affect the choice.
+Evaluate relevant time and space complexity across the full operation, including setup costs and repeated work.
+Better asymptotic complexity does not automatically mean faster execution at the expected input size.
+
+Look for avoidable repeated scans, nested iterations over growing collections, unnecessary sorting, and excessive copying or allocation.
+Choose structures that fit the required operations, such as sets for membership checks or maps for repeated keyed lookups, while preserving ordering, duplicate handling, and other correctness requirements.
+Prefer standard library implementations over custom algorithms unless a concrete requirement justifies the added complexity.
+
+Choose the simplest approach that meets the expected workload; straightforward scans are often appropriate for small, bounded inputs.
+Address clearly unsuitable complexity at the required scale without waiting for profiling.
+Use profiling or representative benchmarks to resolve uncertain performance tradeoffs, especially when an optimization adds complexity or memory overhead.
+Do not introduce speculative caching, indexing, or abstractions for hypothetical scale.
+When efficiency drives a non-obvious design choice, briefly explain the workload assumptions and time, memory, and maintainability tradeoffs.
+
 ## Design Deliberately
 
 Choose module boundaries and file structure before coding.
